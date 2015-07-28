@@ -6,11 +6,17 @@ describe Polo do
     TestData.create_netto
   end
 
+  it 'generates an insert query for the base object' do
+    exp = Polo.explorer(AR::Chef, 1)
+    insert = ["INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')"]
+    expect(exp.run).to eq(insert)
+  end
+
   it 'works with dependencies' do
     exp = Polo.explorer(AR::Chef, 1, [:recipes])
 
     inserts = [
-      #"INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')",
+      "INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')",
       "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 'Turkey Sandwich', NULL, 1)",
       "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)"
     ]
@@ -22,7 +28,7 @@ describe Polo do
     exp = Polo.explorer(AR::Chef, 1, :recipes => :ingredients)
 
     inserts = [
-      #"INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')",
+      "INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')",
       "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 'Turkey Sandwich', NULL, 1)",
       "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)",
       "INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (1, 1, 1)",

@@ -21,7 +21,14 @@ module Polo
       end
 
       ActiveSupport::Notifications.subscribed(queries_collector, 'sql.active_record') do
-        @base_class.includes(@dependency_tree).where(id: @id).to_a
+        base_finder = @base_class.includes(@dependency_tree).where(id: @id)
+
+        selects << {
+          class_name: @base_class,
+          sql: base_finder.to_sql
+        }
+
+        base_finder.to_a
       end
 
       active_record_instances = selects.flat_map do |select|
@@ -32,7 +39,7 @@ module Polo
     end
   end
 
-  def self.explorer(base_class, id, dependencies)
+  def self.explorer(base_class, id, dependencies={})
     Explorer.new(base_class, id, dependencies)
   end
 end
