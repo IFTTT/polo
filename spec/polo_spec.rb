@@ -51,8 +51,8 @@ describe Polo do
     ]
 
     inserts = exp.run
-    many_to_many_inserts.each do |insert|
-      expect(insersts).to include(many_to_many_inserts)
+    many_to_many_inserts.each do |many_to_many_insert|
+      expect(inserts).to include(many_to_many_insert)
     end
   end
 end
