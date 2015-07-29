@@ -1,7 +1,68 @@
 # Polo
-Bring life back to your development environment with samples from production data.
+Polo travels through your database and creates sample snapshots so you can work with real world data in any environment.
 
-Polo travels through your database and creates sample snapshots so you can work with real world data in development.
+Polo takes an `ActiveRecord::Base` seed object and traverses every white listed `ActiveRecord::Association` generating SQL `INSERTs` along the way.
+
+You can then save those SQL `INSERTS` to .sql file and import the data to your favorite environment.
+
+## Usage
+Given the following data model:
+```ruby
+class Chef < ActiveRecord::Base
+  has_many :recipes
+  has_many :ingredients, through: :recipes
+end
+
+class Recipe < ActiveRecord::Base
+  has_many :recipes_ingredients
+  has_many :ingredients, through: :recipes_ingredients
+end
+
+class Ingredient < ActiveRecord::Base
+end
+
+class RecipesIngredient < ActiveRecord::Base
+  belongs_to :recipe
+  belongs_to :ingredient
+end
+```
+
+### Simple ActiveRecord Objects
+```ruby
+inserts = Polo.explore(Chef, 1)
+```
+```sql
+INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
+```
+
+### Simple Associations
+```ruby
+inserts = Polo.explore(Chef, 1, :recipes)
+```
+```sql
+INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
+INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 'Turkey Sandwich', NULL, 1)
+INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)
+```
+
+### Complex nested associations
+```ruby
+inserts = Polo.explore(Chef, 1, :recipes => :ingredients)
+```
+
+```sql
+INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
+INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 'Turkey Sandwich', NULL, 1)
+INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)
+INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (1, 1, 1)
+INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (2, 1, 2)
+INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (3, 2, 3)
+INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (4, 2, 4)
+INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (1, 'Turkey', 'a lot')
+INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (2, 'Cheese', '1 slice')
+INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (3, 'Patty', '1')
+INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (4, 'Cheese', '2 slices')
+```
 
 ## Installation
 
@@ -13,15 +74,11 @@ gem 'polo'
 
 And then execute:
 
-    $ bundle
+  $ bundle
 
 Or install it yourself as:
 
-    $ gem install polo
-
-## Usage
-
-TODO: Write usage instructions here
+  $ gem install polo
 
 ## Contributing
 
