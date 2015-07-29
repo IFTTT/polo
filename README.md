@@ -73,12 +73,14 @@ gem 'polo'
 ```
 
 And then execute:
-
-  $ bundle
+```bash
+$ bundle
+```
 
 Or install it yourself as:
-
-  $ gem install polo
+```bash
+$ gem install polo
+```
 
 ## Contributing
 
