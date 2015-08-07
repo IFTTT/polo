@@ -17,6 +17,7 @@ ActiveRecord::Schema.define do
 
   create_table :chefs, force: true do |t|
     t.column :name, :string
+    t.column :email, :string
   end
 
   create_table :restaurants, force: true do |t|
