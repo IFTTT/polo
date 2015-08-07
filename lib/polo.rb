@@ -4,6 +4,22 @@ require "polo/translator"
 
 module Polo
 
+  class Traveler
+
+    def self.collect(base_class, id, dependencies)
+      selects = Collector.new(base_class, id, dependencies).collect
+      new(selects)
+    end
+
+    def initialize(selects)
+      @selects = selects
+    end
+
+    def translate(options={})
+      Translator.new(@selects, options).translate
+    end
+  end
+
   # Public: Traverses a dependency graph based on a seed ActiveRecord object
   # and generates all the necessary INSERT queries for each one of the records
   # it finds along the way.
@@ -37,7 +53,6 @@ module Polo
   #   [ :books, { author: :avatar } ]
   #
   def self.explore(base_class, id, dependencies={})
-    selects = Collector.new(base_class, id, dependencies).collect
-    Translator.new(selects).translate
+    Traveler.new.collect(base_class, id, dependencies).translate
   end
 end

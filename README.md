@@ -64,6 +64,40 @@ INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (3, 'Patty', '1')
 INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (4, 'Cheese', '2 slices')
 ```
 
+## Advanced Usage
+TODO: intro
+
+### Ignore
+A.k.a the Ostrich Approach: stick your head in the sand and pretend nothing happened.
+
+```ruby
+Polo::Traveler.collect(Chef, 1, :recipes).translate(on_duplicate: :ignore)
+```
+
+```sql
+INSERT IGNORE INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
+INSERT IGNORE INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 'Turkey Sandwich', NULL, 1)
+INSERT IGNORE INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)
+```
+
+ps: this is a MySQL only implementation (PRs are welcome)
+
+### Override
+Use the option `on_duplicate: :override` to override your local data with new
+data from your Polo script.
+
+```ruby
+Polo::Traveler.collect(Chef, 1, :recipes).translate(on_duplicate: :override)
+```
+
+```sql
+INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
+ON DUPLICATE KEY UPDATE id = VALUES(id), name = VALUES(name)
+...
+```
+
+ps: this is a MySQL only implementation (PRs are welcome)
+
 ## Installation
 
 Add this line to your application's Gemfile:

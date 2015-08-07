@@ -13,17 +13,37 @@ module Polo
         raw_sql(record)
       end
 
-      if @options[:ignore_duplicate_rows]
+      if @options[:on_duplicate] == :ignore
+        sqls = ignore_transform(sqls)
+      end
 
-        sqls.map! do |sql|
-          sql.gsub("INSERT", "INSERT IGNORE")
-        end
+      if @options[:on_duplicate] == :override
+        sqls = on_duplicate_key_update(sqls, records)
       end
 
       sqls
     end
 
     private
+
+    def on_duplicate_key_update(sqls, records)
+      insert_and_record = sqls.zip(records)
+      insert_and_record.map do |insert, record|
+        values_syntax = record.attributes.keys.map do |key|
+          "#{key} = VALUES(#{key})"
+        end
+
+        on_dup_syntax = "ON DUPLICATE KEY UPDATE #{values_syntax.join(', ')}"
+
+        "#{insert} #{on_dup_syntax}"
+      end
+    end
+
+    def ignore_transform(inserts)
+      inserts.map do |insert|
+        insert.gsub("INSERT", "INSERT IGNORE")
+      end
+    end
 
     def raw_sql(record)
       connection = ActiveRecord::Base.connection

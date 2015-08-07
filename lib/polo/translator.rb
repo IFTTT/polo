@@ -7,8 +7,9 @@ module Polo
     #
     # selects - An array of SELECT queries
     #
-    def initialize(selects)
+    def initialize(selects, options={})
       @selects = selects
+      @options = options
     end
 
     # Public: Translates SELECT queries into INSERTS.
@@ -18,7 +19,7 @@ module Polo
         select[:klass].find_by_sql(select[:sql]).to_a
       end
 
-      SqlTranslator.new(active_record_instances).to_sql.uniq
+      SqlTranslator.new(active_record_instances, @options).to_sql.uniq
     end
   end
 end
