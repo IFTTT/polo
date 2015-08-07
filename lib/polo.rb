@@ -6,7 +6,7 @@ module Polo
 
   class Traveler
 
-    def self.collect(base_class, id, dependencies)
+    def self.collect(base_class, id, dependencies={})
       selects = Collector.new(base_class, id, dependencies).collect
       new(selects)
     end
@@ -53,6 +53,6 @@ module Polo
   #   [ :books, { author: :avatar } ]
   #
   def self.explore(base_class, id, dependencies={})
-    Traveler.new.collect(base_class, id, dependencies).translate
+    Traveler.collect(base_class, id, dependencies).translate
   end
 end

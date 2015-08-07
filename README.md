@@ -98,6 +98,22 @@ ON DUPLICATE KEY UPDATE id = VALUES(id), name = VALUES(name)
 
 ps: this is a MySQL only implementation (PRs are welcome)
 
+### Sensitive Fields
+You can use the `obfuscate` option to obfuscate sensitive fields like emails or
+user logins.
+
+```ruby
+Polo::Traveler.collect(AR::Chef, 1).translate(obfuscate: [:email])
+```
+
+```sql
+INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'eahorctmaagfo.nitm@l')
+```
+
+Warning: This is not a security feature. Fields can still easily be rearranged back to their original format. Polo will simply scramble the order of strings so you don't accidentaly end up causing side effects when using production data in development.
+
+It is not a good practice to use highly sensitive data in development.
+
 ## Installation
 
 Add this line to your application's Gemfile:

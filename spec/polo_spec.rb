@@ -8,7 +8,7 @@ describe Polo do
 
   it 'generates an insert query for the base object' do
     exp = Polo.explore(AR::Chef, 1)
-    insert = "INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')"
+    insert = "INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'nettofarah@gmail.com')"
     expect(exp).to include(insert)
   end
 
@@ -48,6 +48,20 @@ describe Polo do
 
     many_to_many_inserts.each do |many_to_many_insert|
       expect(inserts).to include(many_to_many_insert)
+    end
+  end
+
+  describe "Advanced Options" do
+    describe 'obfuscate: [fields]' do
+
+      it 'scrambles a predefined field' do
+        exp = Polo::Traveler.collect(AR::Chef, 1).translate(obfuscate: [:email])
+        insert = /INSERT INTO `chefs` \(`id`, `name`, `email`\) VALUES \(1, 'Netto', (.+)\)/
+        scrambled_email = insert.match(exp.first)[1]
+
+        expect(scrambled_email).to_not eq('nettofarah@gmail.com')
+        expect(insert).to match(exp.first)
+      end
     end
   end
 end
