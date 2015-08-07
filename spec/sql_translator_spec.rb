@@ -16,12 +16,24 @@ describe Polo::SqlTranslator do
     expect(netto_to_sql).to eq(insert_netto)
   end
 
-  describe "ignore_duplicate_rows" do
+  describe "options" do
+    describe "on_duplicate: :ignore" do
+      it 'uses INSERT IGNORE as opposed to regular inserts' do
+        insert_netto = [%q{INSERT IGNORE INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')}]
+        netto_to_sql = Polo::SqlTranslator.new(netto, on_duplicate: :ignore ).to_sql
+        expect(netto_to_sql).to eq(insert_netto)
+      end
+    end
 
-    it 'uses INSERT IGNORE as opposed to regular inserts' do
-      insert_netto = [%q{INSERT IGNORE INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')}]
-      netto_to_sql = Polo::SqlTranslator.new(netto, OpenStruct.new(ignore_duplicate_rows: true)).to_sql
-      expect(netto_to_sql).to eq(insert_netto)
+    describe "on_duplicate: :override" do
+      it 'appends ON DUPLICATE KEY UPDATE to the statement' do
+        insert_netto = [
+          %q{INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto') ON DUPLICATE KEY UPDATE id = VALUES(id), name = VALUES(name)}
+        ]
+
+        netto_to_sql = Polo::SqlTranslator.new(netto, on_duplicate: :override).to_sql
+        expect(netto_to_sql).to eq(insert_netto)
+      end
     end
   end
 end
