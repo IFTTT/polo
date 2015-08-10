@@ -33,13 +33,13 @@ module Polo
     #
     def collector
       lambda do |name, start, finish, id, payload|
-        if payload[:sql].include?('SHOW FULL FIELDS')
-          next
+        begin
+          class_name = payload[:name].gsub(' Load', '').constantize
+          sql = payload[:sql]
+          collect_sql(class_name, sql)
+        rescue ActiveRecord::StatementInvalid, NameError
+          # invalid table name (common when prefetching schemas)
         end
-
-        class_name = payload[:name].gsub(' Load', '').constantize
-        sql = payload[:sql]
-        collect_sql(class_name, sql)
       end
     end
 
