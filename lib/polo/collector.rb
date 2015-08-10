@@ -20,7 +20,7 @@ module Polo
         base_finder.to_a
       end
 
-      @selects.uniq
+      @selects.compact.uniq
     end
 
     private
@@ -33,6 +33,10 @@ module Polo
     #
     def collector
       lambda do |name, start, finish, id, payload|
+        if payload[:sql].include?('SHOW FULL FIELDS')
+          next
+        end
+
         class_name = payload[:name].gsub(' Load', '').constantize
         sql = payload[:sql]
         collect_sql(class_name, sql)
