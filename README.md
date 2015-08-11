@@ -65,10 +65,15 @@ INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (4, 'Cheese', '2 sli
 ```
 
 ## Advanced Usage
-TODO: intro
+
+Occasionally, you might have a dataset that you want to refresh. A production database that has data that might be useful on your local copy of the database. Polo doesn't have an opinion about your data; if you try to import data with a key that's already in your local database, Polo doesn't necessarily know how you want to handle that conflict.
+
+Advanced users will find the `on_duplicate` option to be helpful in this context. It gives Polo instructions on how to handle collisions. *Note: This feature is currently only supported for MySQL databases. (PRs for other databases are welcome!)*
+
+There are two possible values for the `on_duplicate` key: `:ignore` and `:override`. Ignore keeps the old data. Override keeps the new data. If there's a collision and the on_duplicate param is not set, Polo will simpy stop importing the data.
 
 ### Ignore
-A.k.a the Ostrich Approach: stick your head in the sand and pretend nothing happened.
+A.K.A the Ostrich Approach: stick your head in the sand and pretend nothing happened.
 
 ```ruby
 Polo::Traveler.collect(Chef, 1, :recipes).translate(on_duplicate: :ignore)
@@ -80,11 +85,8 @@ INSERT IGNORE INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 
 INSERT IGNORE INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)
 ```
 
-ps: this is a MySQL only implementation (PRs are welcome)
-
 ### Override
-Use the option `on_duplicate: :override` to override your local data with new
-data from your Polo script.
+Use the option `on_duplicate: :override` to override your local data with new data from your Polo script.
 
 ```ruby
 Polo::Traveler.collect(Chef, 1, :recipes).translate(on_duplicate: :override)
@@ -95,8 +97,6 @@ INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
 ON DUPLICATE KEY UPDATE id = VALUES(id), name = VALUES(name)
 ...
 ```
-
-ps: this is a MySQL only implementation (PRs are welcome)
 
 ### Sensitive Fields
 You can use the `obfuscate` option to obfuscate sensitive fields like emails or
