@@ -1,7 +1,7 @@
 # Polo
 Polo travels through your database and creates sample snapshots so you can work with real world data in any environment.
 
-Polo takes an `ActiveRecord::Base` seed object and traverses every white listed `ActiveRecord::Association` generating SQL `INSERTs` along the way.
+Polo takes an `ActiveRecord::Base` seed object and traverses every whitelisted `ActiveRecord::Association` generating SQL `INSERTs` along the way.
 
 You can then save those SQL `INSERTS` to .sql file and import the data to your favorite environment.
 
