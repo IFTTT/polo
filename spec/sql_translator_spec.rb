@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Polo::SqlTranslator do
 
   let(:netto) do
-    AR::Chef.find_by(name: 'Netto')
+    AR::Chef.where(name: 'Netto').first
   end
 
   before(:all) do
