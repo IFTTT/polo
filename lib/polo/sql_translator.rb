@@ -1,3 +1,5 @@
+require 'active_record'
+
 module Polo
   class SqlTranslator
 
@@ -53,12 +55,38 @@ module Polo
         "`#{key}`"
       end
 
-      values = attributes.values.map do |value|
-        connection.quote(value)
+      values = attributes.map do |key, value|
+        column = record.column_for_attribute(key)
+        connection.quote(cast_attribute(record, column, value))
       end
 
       "INSERT INTO `#{record.class.table_name}` (#{keys.join(', ')}) VALUES (#{values.join(', ')})"
     end
+
+    module ActiveRecordLessThanFourPointTwo
+      def cast_attribute(record, column, value)
+        attribute = record.send(:type_cast_attribute_for_write, column, value)
+
+        if record.class.serialized_attributes.include?(column.name)
+          attribute.serialize
+        else
+          attribute
+        end
+      end
+    end
+
+    module ActiveRecordFourPointTwoOrGreater
+      def cast_attribute(record, column, value)
+        column.type_cast_for_database(value)
+      end
+    end
+
+    if ActiveRecord::VERSION::STRING.start_with?('3.2') ||
+        ActiveRecord::VERSION::STRING.start_with?('4.0') ||
+        ActiveRecord::VERSION::STRING.start_with?('4.1')
+      include ActiveRecordLessThanFourPointTwo
+    else
+      include ActiveRecordFourPointTwoOrGreater
+    end
   end
 end
-

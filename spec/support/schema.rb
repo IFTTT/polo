@@ -3,6 +3,7 @@ ActiveRecord::Schema.define do
     t.column :title, :string
     t.column :num_steps, :integer
     t.column :chef_id, :integer
+    t.column :metadata, :text
   end
 
   create_table :ingredients, force: true do |t|
