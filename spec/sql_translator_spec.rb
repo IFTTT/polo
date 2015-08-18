@@ -16,6 +16,12 @@ describe Polo::SqlTranslator do
     expect(netto_to_sql).to eq(insert_netto)
   end
 
+  it 'encodes serialized fields correctly' do
+    recipe = AR::Recipe.create(title: 'Polenta', metadata: { quality: 'ok' })
+    recipe_to_sql = Polo::SqlTranslator.new(recipe).to_sql.first
+    expect(recipe_to_sql).to include(%q{'{"quality":"ok"}'}) # JSON, not YAML
+  end
+
   describe "options" do
     describe "on_duplicate: :ignore" do
       it 'uses INSERT IGNORE as opposed to regular inserts' do

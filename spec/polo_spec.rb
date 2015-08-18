@@ -13,8 +13,14 @@ describe Polo do
   end
 
   it 'generates insert queries for dependencies' do
-    turkey_insert        = "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (1, 'Turkey Sandwich', NULL, 1)"
-    cheese_burger_insert = "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 'Cheese Burger', NULL, 1)"
+    if ActiveRecord::VERSION::STRING.start_with?('4.2')
+      serialized_nil = "NULL"
+    else
+      serialized_nil = "'null'"
+    end
+
+    turkey_insert        = "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`, `metadata`) VALUES (1, 'Turkey Sandwich', NULL, 1, #{serialized_nil})"
+    cheese_burger_insert = "INSERT INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`, `metadata`) VALUES (2, 'Cheese Burger', NULL, 1, #{serialized_nil})"
 
     inserts = Polo.explore(AR::Chef, 1, [:recipes])
 
@@ -36,7 +42,7 @@ describe Polo do
     expect(inserts).to include(two_cheeses)
   end
 
-  it 'generates insersts for many to many relationships' do
+  it 'generates inserts for many to many relationships' do
     many_to_many_inserts = [
       "INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (1, 1, 1)",
       "INSERT INTO `recipes_ingredients` (`id`, `recipe_id`, `ingredient_id`) VALUES (2, 1, 2)",

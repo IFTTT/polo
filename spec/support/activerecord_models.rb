@@ -3,6 +3,8 @@ module AR
     belongs_to :chef
     has_many :recipes_ingredients
     has_many :ingredients, through: :recipes_ingredients
+
+    serialize :metadata, JSON
   end
 
   class Ingredient < ActiveRecord::Base
