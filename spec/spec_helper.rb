@@ -8,8 +8,16 @@ require 'support/schema'
 require 'support/activerecord_models'
 require 'support/factories'
 
+module Polo
+  def self.reset!
+    @configuration = Configuration.new
+  end
+end
+
 RSpec.configure do |c|
   c.around(:example) do |example|
+    Polo.reset!
+
     ActiveRecord::Base.transaction do
       example.run
       raise ActiveRecord::Rollback

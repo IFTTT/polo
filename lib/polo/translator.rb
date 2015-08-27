@@ -1,4 +1,5 @@
 require "polo/sql_translator"
+require "polo/configuration"
 
 module Polo
   class Translator
@@ -7,15 +8,15 @@ module Polo
     #
     # selects - An array of SELECT queries
     #
-    def initialize(selects, options={})
+    def initialize(selects, configuration=Configuration.new)
       @selects = selects
-      @options = options
+      @configuration = configuration
     end
 
     # Public: Translates SELECT queries into INSERTS.
     #
     def translate
-      SqlTranslator.new(instances, @options).to_sql.uniq
+      SqlTranslator.new(instances, @configuration).to_sql.uniq
     end
 
     def instances
@@ -23,7 +24,7 @@ module Polo
         select[:klass].find_by_sql(select[:sql]).to_a
       end
 
-      if fields = @options[:obfuscate] and fields.is_a?(Array)
+      if fields = @configuration.blacklist
         obfuscate!(active_record_instances, fields.map(&:to_s))
       end
 

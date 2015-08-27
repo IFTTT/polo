@@ -61,11 +61,27 @@ describe Polo do
     describe 'obfuscate: [fields]' do
 
       it 'scrambles a predefined field' do
-        exp = Polo::Traveler.collect(AR::Chef, 1).translate(obfuscate: [:email])
+        Polo.configure do
+          obfuscate(:email)
+        end
+
+        exp = Polo.explore(AR::Chef, 1)
         insert = /INSERT INTO `chefs` \(`id`, `name`, `email`\) VALUES \(1, 'Netto', (.+)\)/
         scrambled_email = insert.match(exp.first)[1]
 
         expect(scrambled_email).to_not eq('nettofarah@gmail.com')
+        expect(insert).to match(exp.first)
+      end
+    end
+
+    describe 'on_duplicate' do
+      it 'applies the on_duplicate strategy' do
+        Polo.configure do
+          on_duplicate(:ignore)
+        end
+
+        exp = Polo.explore(AR::Chef, 1)
+        insert = /INSERT IGNORE INTO `chefs` \(`id`, `name`, `email`\) VALUES \(1, 'Netto', (.+)\)/
         expect(insert).to match(exp.first)
       end
     end

@@ -35,6 +35,8 @@ inserts = Polo.explore(Chef, 1)
 INSERT INTO `chefs` (`id`, `name`) VALUES (1, 'Netto')
 ```
 
+Where `Chef` is the seed object class, and `1` is the seed object id.
+
 ### Simple Associations
 ```ruby
 inserts = Polo.explore(Chef, 1, :recipes)
@@ -76,7 +78,11 @@ There are two possible values for the `on_duplicate` key: `:ignore` and `:overri
 A.K.A the Ostrich Approach: stick your head in the sand and pretend nothing happened.
 
 ```ruby
-Polo::Traveler.collect(Chef, 1, :recipes).translate(on_duplicate: :ignore)
+Polo.configure do
+  on_duplicate :ignore
+end
+
+Polo::Traveler.explore(Chef, 1, :recipes)
 ```
 
 ```sql
@@ -89,7 +95,11 @@ INSERT IGNORE INTO `recipes` (`id`, `title`, `num_steps`, `chef_id`) VALUES (2, 
 Use the option `on_duplicate: :override` to override your local data with new data from your Polo script.
 
 ```ruby
-Polo::Traveler.collect(Chef, 1, :recipes).translate(on_duplicate: :override)
+Polo.configure do
+  on_duplicate :override
+end
+
+Polo::Traveler.explore(Chef, 1, :recipes)
 ```
 
 ```sql
@@ -103,7 +113,11 @@ You can use the `obfuscate` option to obfuscate sensitive fields like emails or
 user logins.
 
 ```ruby
-Polo::Traveler.collect(AR::Chef, 1).translate(obfuscate: [:email])
+Polo.configure do
+  obfuscate :email, :credit_card
+end
+
+Polo::Traveler.explore(AR::Chef, 1)
 ```
 
 ```sql

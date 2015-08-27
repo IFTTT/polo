@@ -1,11 +1,12 @@
 require 'active_record'
+require 'polo/configuration'
 
 module Polo
   class SqlTranslator
 
-    def initialize(object, options={})
+    def initialize(object, configuration=Configuration.new)
       @record = object
-      @options = options
+      @configuration = configuration
     end
 
     def to_sql
@@ -15,11 +16,11 @@ module Polo
         raw_sql(record)
       end
 
-      if @options[:on_duplicate] == :ignore
+      if @configuration.on_duplicate_strategy == :ignore
         sqls = ignore_transform(sqls)
       end
 
-      if @options[:on_duplicate] == :override
+      if @configuration.on_duplicate_strategy == :override
         sqls = on_duplicate_key_update(sqls, records)
       end
 

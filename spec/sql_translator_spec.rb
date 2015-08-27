@@ -26,7 +26,7 @@ describe Polo::SqlTranslator do
     describe "on_duplicate: :ignore" do
       it 'uses INSERT IGNORE as opposed to regular inserts' do
         insert_netto = [%q{INSERT IGNORE INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'nettofarah@gmail.com')}]
-        netto_to_sql = Polo::SqlTranslator.new(netto, on_duplicate: :ignore ).to_sql
+        netto_to_sql = Polo::SqlTranslator.new(netto, Polo::Configuration.new(on_duplicate: :ignore)).to_sql
         expect(netto_to_sql).to eq(insert_netto)
       end
     end
@@ -37,7 +37,7 @@ describe Polo::SqlTranslator do
           %q{INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'nettofarah@gmail.com') ON DUPLICATE KEY UPDATE id = VALUES(id), name = VALUES(name), email = VALUES(email)}
         ]
 
-        netto_to_sql = Polo::SqlTranslator.new(netto, on_duplicate: :override).to_sql
+        netto_to_sql = Polo::SqlTranslator.new(netto, Polo::Configuration.new(on_duplicate: :override)).to_sql
         expect(netto_to_sql).to eq(insert_netto)
       end
     end
