@@ -1,24 +1,9 @@
 require "polo/version"
 require "polo/collector"
 require "polo/translator"
+require "polo/configuration"
 
 module Polo
-
-  class Traveler
-
-    def self.collect(base_class, id, dependencies={})
-      selects = Collector.new(base_class, id, dependencies).collect
-      new(selects)
-    end
-
-    def initialize(selects)
-      @selects = selects
-    end
-
-    def translate(options={})
-      Translator.new(@selects, options).translate
-    end
-  end
 
   # Public: Traverses a dependency graph based on a seed ActiveRecord object
   # and generates all the necessary INSERT queries for each one of the records
@@ -53,6 +38,50 @@ module Polo
   #   [ :books, { author: :avatar } ]
   #
   def self.explore(base_class, id, dependencies={})
-    Traveler.collect(base_class, id, dependencies).translate
+    Traveler.collect(base_class, id, dependencies).translate(defaults)
+  end
+
+
+  # Public: Sets up global settings for Polo
+  #
+  # block - Takes a block with the settings you decide to use
+  #
+  #   obfuscate - Takes a blacklist with sensitive fields you wish to scramble
+  #   on_duplicate - Defines the on_duplicate strategy for your INSERTS
+  #     e.g. :override, :ignore
+  #
+  # usage:
+  #   Polo.configure do
+  #     obfuscate(:email, :password, :credit_card)
+  #     on_duplicate(:override)
+  #   end
+  #
+  def self.configure(&block)
+    @configuration = Configuration.new
+    @configuration.instance_eval(&block) if block_given?
+    @configuration
+  end
+
+  # Public: Returns the default settings
+  #
+  def self.defaults
+    @configuration || configure
+  end
+
+
+  class Traveler
+
+    def self.collect(base_class, id, dependencies={})
+      selects = Collector.new(base_class, id, dependencies).collect
+      new(selects)
+    end
+
+    def initialize(selects)
+      @selects = selects
+    end
+
+    def translate(configuration=Configuration.new)
+      Translator.new(@selects, configuration).translate
+    end
   end
 end

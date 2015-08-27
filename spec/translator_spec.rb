@@ -16,7 +16,7 @@ describe Polo::Translator do
   describe "options" do
     describe "obfuscate: [fields]" do
       it 'scrambles an specific field' do
-        translator = Polo::Translator.new([finder], obfuscate: [:email])
+        translator = Polo::Translator.new([finder], Polo::Configuration.new(obfuscate: [:email]))
         netto = translator.instances.first
 
         expect(netto.email).to_not be_nil
