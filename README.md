@@ -1,3 +1,7 @@
+[![Open Source at IFTTT](http://ifttt.github.io/images/open-source-ifttt.svg)](http://ifttt.github.io)
+
+![Polo](https://raw.githubusercontent.com/IFTTT/polo/images/images/polo.png "Polo")
+
 # Polo
 Polo travels through your database and creates sample snapshots so you can work with real world data in any environment.
 
