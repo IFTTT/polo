@@ -128,7 +128,7 @@ Polo::Traveler.explore(AR::Chef, 1)
 INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'eahorctmaagfo.nitm@l')
 ```
 
-Warning: This is not a security feature. Fields can still easily be rearranged back to their original format. Polo will simply scramble the order of strings so you don't accidentaly end up causing side effects when using production data in development.
+Warning: This is not a security feature. Fields can still easily be rearranged back to their original format. Polo will simply scramble the order of strings so you don't accidentally end up causing side effects when using production data in development.
 
 It is not a good practice to use highly sensitive data in development.
 
