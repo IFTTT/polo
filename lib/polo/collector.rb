@@ -14,10 +14,12 @@ module Polo
     # ActiveSupport::Notifications block and collecting every generate SQL query.
     #
     def collect
-      ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
-        base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
-        collect_sql(@base_class, base_finder.to_sql)
-        base_finder.to_a
+      unprepared_statement do
+        ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
+          base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
+          collect_sql(@base_class, base_finder.to_sql)
+          base_finder.to_a
+        end
       end
 
       @selects.compact.uniq
@@ -33,8 +35,9 @@ module Polo
     #
     def collector
       lambda do |name, start, finish, id, payload|
+        return unless payload[:name] =~ /^(.*) Load$/
         begin
-          class_name = payload[:name].gsub(' Load', '').constantize
+          class_name = $1.constantize
           sql = payload[:sql]
           collect_sql(class_name, sql)
         rescue ActiveRecord::StatementInvalid, NameError
@@ -48,6 +51,16 @@ module Polo
         klass: klass,
         sql: sql
       }
+    end
+
+    def unprepared_statement
+      if ActiveRecord::Base.connection.respond_to?(:unprepared_statement)
+        ActiveRecord::Base.connection.unprepared_statement do
+          yield
+        end
+      else
+        yield
+      end
     end
   end
 end
