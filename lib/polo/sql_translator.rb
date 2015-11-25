@@ -52,16 +52,20 @@ module Polo
       connection = ActiveRecord::Base.connection
       attributes = record.attributes
 
-      keys = attributes.keys.map do |key|
-        "`#{key}`"
-      end
-
-      values = attributes.map do |key, value|
+      keys = []
+      values = []
+      attributes.each_pair do |key, value|
         column = record.column_for_attribute(key)
-        connection.quote(cast_attribute(record, column, value))
+
+        next unless column
+
+        keys << connection.quote_column_name(key)
+        values << connection.quote(cast_attribute(record, column, value))
       end
 
-      "INSERT INTO `#{record.class.table_name}` (#{keys.join(', ')}) VALUES (#{values.join(', ')})"
+      quoted_table_name = connection.quote_table_name record.class.table_name
+
+      "INSERT INTO #{quoted_table_name} (#{keys.join(', ')}) VALUES (#{values.join(', ')})"
     end
 
     module ActiveRecordLessThanFourPointTwo
