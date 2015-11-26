@@ -31,4 +31,8 @@ ActiveRecord::Schema.define do
     t.column :value, :string
     t.column :restaurant_id, :integer
   end
+
+  create_table :people, primary_key: :ssn, force: true do |t|
+    t.column :name, :string
+  end
 end
