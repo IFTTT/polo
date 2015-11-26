@@ -15,7 +15,7 @@ module Polo
     #
     def collect
       ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
-        base_finder = @base_class.includes(@dependency_tree).where(id: @id)
+        base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
         collect_sql(@base_class, base_finder.to_sql)
         base_finder.to_a
       end

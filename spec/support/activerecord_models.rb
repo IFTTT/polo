@@ -29,4 +29,8 @@ module AR
     has_many :ingredients, through: :recipes
     has_one  :restaurant, foreign_key: 'owner_id'
   end
+
+  class Person < ActiveRecord::Base
+    self.primary_key = :ssn
+  end
 end

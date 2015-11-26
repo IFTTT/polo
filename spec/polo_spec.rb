@@ -12,6 +12,12 @@ describe Polo do
     expect(exp).to include(insert)
   end
 
+  it 'generates an insert query for the objects with non-standard primary keys' do
+    exp = Polo.explore(AR::Person, 1)
+    insert = "INSERT INTO `people` (`ssn`, `name`) VALUES (1, 'John Doe')"
+    expect(exp).to include(insert)
+  end
+
   it 'generates insert queries for dependencies' do
     if ActiveRecord::VERSION::STRING.start_with?('4.2')
       serialized_nil = "NULL"

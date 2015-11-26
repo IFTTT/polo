@@ -12,5 +12,7 @@ module TestData
         r.ingredients.create(name: 'Cheese', quantity: '2 slices')
       end
     end
+
+    AR::Person.create(name: 'John Doe')
   end
 end
