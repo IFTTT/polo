@@ -1,4 +1,5 @@
 [![Open Source at IFTTT](http://ifttt.github.io/images/open-source-ifttt.svg)](http://ifttt.github.io)
+[![Build Status](https://travis-ci.org/IFTTT/polo.svg?branch=master)](https://travis-ci.org/IFTTT/polo)
 
 ![Polo](https://raw.githubusercontent.com/IFTTT/polo/images/images/polo.png "Polo")
 
