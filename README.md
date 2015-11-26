@@ -74,7 +74,8 @@ INSERT INTO `ingredients` (`id`, `name`, `quantity`) VALUES (4, 'Cheese', '2 sli
 
 Occasionally, you might have a dataset that you want to refresh. A production database that has data that might be useful on your local copy of the database. Polo doesn't have an opinion about your data; if you try to import data with a key that's already in your local database, Polo doesn't necessarily know how you want to handle that conflict.
 
-Advanced users will find the `on_duplicate` option to be helpful in this context. It gives Polo instructions on how to handle collisions. *Note: This feature is currently only supported for MySQL databases. (PRs for other databases are welcome!)*
+Advanced users will find the `on_duplicate` option to be helpful in this context. It gives Polo instructions on how to handle collisions.
+*Note: This feature is currently only supported for MySQL databases. (PRs for other databases are welcome!)*
 
 There are two possible values for the `on_duplicate` key: `:ignore` and `:override`. Ignore keeps the old data. Override keeps the new data. If there's a collision and the on_duplicate param is not set, Polo will simpy stop importing the data.
 
