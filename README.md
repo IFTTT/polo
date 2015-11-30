@@ -130,11 +130,12 @@ Polo::Traveler.explore(AR::Chef, 1)
 INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'eahorctmaagfo.nitm@l')
 ```
 
-Warning: This is not a security feature. Fields can still easily be rearranged back to their original format. Polo will simply scramble the order of strings so you don't accidentally end up causing side effects when using production data in development.
+Warning: This is not a security feature. Fields can still easily be rearranged back to their original format. Polo will simply scramble the order of strings so you don't accidentally end up causing side effects when using production data in development. It is not a good practice to use highly sensitive data in development.
 
-It is not a good practice to use highly sensitive data in development.
+#### Advanced Obfuscation
 
-For more advanced obfuscation, you can pass in an obfuscation strategy.
+For more advanced obfuscation, you can pass in a custom obfuscation strategy.
+Polo will take in a lambda that can be used to transform sensitive data.
 
 ````ruby
 Polo.configure do
@@ -147,7 +148,7 @@ Polo::Traveler.explore(AR::Chef, 1)
 ````
 
 ```sql
-INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'eahorctmaagfo.nitm@l')
+INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'netto_test.@example.com')
 ```
 
 ## Installation
