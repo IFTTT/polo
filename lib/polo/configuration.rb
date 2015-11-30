@@ -4,7 +4,7 @@ module Polo
     attr_reader :on_duplicate_strategy, :blacklist
 
     def initialize(options={})
-      options = { on_duplicate: nil, obfuscate: [] }.merge(options)
+      options = { on_duplicate: nil, obfuscate: {} }.merge(options)
       @on_duplicate_strategy = options[:on_duplicate]
       @blacklist = options[:obfuscate]
     end

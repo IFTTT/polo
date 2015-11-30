@@ -25,7 +25,7 @@ module Polo
       end
 
       if fields = @configuration.blacklist
-        obfuscate!(active_record_instances, fields.map(&:to_s))
+        obfuscate!(active_record_instances, fields)
       end
 
       active_record_instances
@@ -35,11 +35,23 @@ module Polo
 
     def obfuscate!(instances, fields)
       instances.each do |instance|
-        next if (instance.attributes.keys & fields).empty?
-        fields.each do |field|
-          value = instance.attributes[field] || ''
-          instance.send("#{field}=", value.split('').shuffle.join)
+        next if intersection(instance.attributes.keys, fields).empty?
+        fields.each do |field, strategy|
+          value = instance.attributes[field.to_s] || ''
+          instance.send("#{field}=", new_field_value(field, strategy, value))
         end
+      end
+    end
+
+    def intersection(attrs, fields)
+      attrs & fields.to_a.flatten.map(&:to_s)
+    end
+
+    def new_field_value(field, strategy, value)
+      if strategy.nil?
+        value.split("").shuffle.join
+      else
+        strategy.call(value)
       end
     end
   end
