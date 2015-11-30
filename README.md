@@ -10,6 +10,9 @@ Polo takes an `ActiveRecord::Base` seed object and traverses every whitelisted `
 
 You can then save those SQL `INSERTS` to .sql file and import the data to your favorite environment.
 
+# Motivation
+Read our [blog post](https://medium.com/engineering-at-ifttt/happier-rails-development-with-polo-9df6819136d3#.f8ll3azeq) or check out this [presentation](https://speakerdeck.com/nettofarah/polo-working-with-real-world-data-in-development).
+
 ## Usage
 Given the following data model:
 ```ruby
