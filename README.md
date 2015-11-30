@@ -134,6 +134,22 @@ Warning: This is not a security feature. Fields can still easily be rearranged b
 
 It is not a good practice to use highly sensitive data in development.
 
+For more advanced obfuscation, you can pass in an obfuscation strategy.
+
+````ruby
+Polo.configure do
+  email_strategy = lambda {|e| "#{e.split("@")[0]}_test@example.com" }
+  credit_card_strategy = lambda {|_| "4111111111111111"}
+  obfuscate({email: email_strategy, credit_card: credit_card_strategy})
+end
+
+Polo::Traveler.explore(AR::Chef, 1)
+````
+
+```sql
+INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'eahorctmaagfo.nitm@l')
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
