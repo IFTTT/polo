@@ -28,18 +28,20 @@ describe Polo::Configuration do
       end
 
       defaults = Polo.defaults
-      expect(defaults.blacklist).to eq([:email, :password])
+      expect(defaults.blacklist).to eq({ :email => nil, :password => nil })
     end
 
     it 'allows for the user to define fields with strategies in blacklist' do
       Polo.configure do
+
         email_strategy = lambda {|e| "#{e.split("@")[0]}_test@example.com" }
         credit_card_strategy = lambda {|_| "4111111111111111"}
+
         obfuscate({email: email_strategy, credit_card: credit_card_strategy})
       end
 
       defaults = Polo.defaults
-      expect(defaults.blacklist.first[:email].call("a@b.com")).to eq("a_test@example.com")
+      expect(defaults.blacklist[:email].call("a@b.com")).to eq("a_test@example.com")
     end
   end
 end
