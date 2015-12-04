@@ -19,7 +19,7 @@ describe Polo::Translator do
       let(:translator) { Polo::Translator.new([finder], Polo::Configuration.new(obfuscate: obfuscated_fields)) }
       let(:netto) { netto = translator.instances.first }
 
-      context "with obfuscated field with no specified strategy" do
+      context "obfuscated field with no specified strategy" do
         let(:obfuscated_fields) {{email: nil }}
 
         it "shuffles characters in field" do
@@ -29,7 +29,7 @@ describe Polo::Translator do
         end
       end
 
-      context "with obfuscated field with obscuration strategy applied which will result in 42" do
+      context "obfuscated field with obscuration strategy applied which will result in 42" do
         let(:obfuscated_fields) {{email: lambda { |_| 42 } } }
 
         it "replaces contents of field according to the supplied lambda" do
@@ -37,7 +37,17 @@ describe Polo::Translator do
         end
       end
 
-      context "with no strategy passed in" do
+      context "complex custom obfuscation strategy" do
+        let(:obfuscated_fields) do
+          { email: lambda { |field| "temp_#{field}" } }
+        end
+
+        it "replaces contents of field according to the supplied lambda" do
+          expect(netto.email.to_s).to eq "temp_nettofarah@gmail.com"
+        end
+      end
+
+      context "no strategy passed in" do
         let(:obfuscated_fields) { [:email] }
 
         it "shuffles contents" do
