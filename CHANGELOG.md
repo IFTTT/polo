@@ -1,4 +1,4 @@
-## Master (current)
+## 0.2.0
 
 ### Breaking Changes
 
@@ -9,11 +9,13 @@
 - [#8](https://github.com/IFTTT/polo/pull/8) Global settings
 - [#17](https://github.com/IFTTT/polo/pull/17) Using random generator instead of character shuffle for data obfuscation
 - [#18](https://github.com/IFTTT/polo/pull/18) Add a CHANGELOG
+- [#20](https://github.com/IFTTT/polo/pull/20) Postgres Support
 
 ### Fixed
 
 - Typo fixes on the README: [#9](https://github.com/IFTTT/polo/pull/9), [#10](https://github.com/IFTTT/polo/pull/10)
 - [#11]() Some ActiveRecord classes do not use id as the primary key
+- [#25](https://github.com/IFTTT/polo/pull/25) Fix Custom Strategy
 
 ## 0.1.0
 
