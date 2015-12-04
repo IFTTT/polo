@@ -78,6 +78,16 @@ describe Polo do
         expect(scrambled_email).to_not eq('nettofarah@gmail.com')
         expect(insert).to match(exp.first)
       end
+
+      it 'can apply custom strategies' do
+        Polo.configure do
+          obfuscate(email: lambda { |_| 'changeme' })
+        end
+
+        inserts = Polo.explore(AR::Chef, 1)
+
+        expect(inserts).to eq [ %q{INSERT INTO `chefs` (`id`, `name`, `email`) VALUES (1, 'Netto', 'changeme')} ]
+      end
     end
 
     describe 'on_duplicate' do
