@@ -48,18 +48,33 @@ module Polo
       end
     end
 
+    # Internal: Generates an insert SQL statement for a given record
+    #
+    # It will make use of the InsertManager class from the Arel gem to generate
+    # insert statements
+    #
     def raw_sql(record)
       record.class.arel_table.create_insert.tap do |insert_manager|
         insert_manager.insert(insert_values(record))
       end.to_sql
     end
 
+    # Internal: Returns an object's attribute definitions along with
+    # their set values (for Rails 3.x).
+    #
     module ActiveRecordLessThanFour
       def insert_values(record)
         record.send(:arel_attributes_values)
       end
     end
 
+    # Internal: Returns an object's attribute definitions along with
+    # their set values (for Rails >= 4.x).
+    #
+    # From Rails 4.2 onwards, for some reason attributes with custom serializers
+    # wouldn't be properly serialized automatically. That's why explict
+    # 'type_cast' call are necessary.
+    #
     module ActiveRecordFourOrGreater
       def insert_values(record)
         connection = ActiveRecord::Base.connection
