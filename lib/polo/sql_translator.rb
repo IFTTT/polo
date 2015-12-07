@@ -48,46 +48,48 @@ module Polo
       end
     end
 
+    # Internal: Generates an insert SQL statement for a given record
+    #
+    # It will make use of the InsertManager class from the Arel gem to generate
+    # insert statements
+    #
     def raw_sql(record)
-      connection = ActiveRecord::Base.connection
-      attributes = record.attributes
-
-      keys = attributes.keys.map do |key|
-        "`#{key}`"
-      end
-
-      values = attributes.map do |key, value|
-        column = record.column_for_attribute(key)
-        connection.quote(cast_attribute(record, column, value))
-      end
-
-      "INSERT INTO `#{record.class.table_name}` (#{keys.join(', ')}) VALUES (#{values.join(', ')})"
+      record.class.arel_table.create_insert.tap do |insert_manager|
+        insert_manager.insert(insert_values(record))
+      end.to_sql
     end
 
-    module ActiveRecordLessThanFourPointTwo
-      def cast_attribute(record, column, value)
-        attribute = record.send(:type_cast_attribute_for_write, column, value)
+    # Internal: Returns an object's attribute definitions along with
+    # their set values (for Rails 3.x).
+    #
+    module ActiveRecordLessThanFour
+      def insert_values(record)
+        record.send(:arel_attributes_values)
+      end
+    end
 
-        if record.class.serialized_attributes.include?(column.name)
-          attribute.serialize
-        else
-          attribute
+    # Internal: Returns an object's attribute definitions along with
+    # their set values (for Rails >= 4.x).
+    #
+    # From Rails 4.2 onwards, for some reason attributes with custom serializers
+    # wouldn't be properly serialized automatically. That's why explict
+    # 'type_cast' call are necessary.
+    #
+    module ActiveRecordFourOrGreater
+      def insert_values(record)
+        connection = ActiveRecord::Base.connection
+        values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
+        values.each do |attribute, value|
+          column = record.column_for_attribute(attribute.name)
+          values[attribute] = connection.type_cast(value, column)
         end
       end
     end
 
-    module ActiveRecordFourPointTwoOrGreater
-      def cast_attribute(record, column, value)
-        column.type_cast_for_database(value)
-      end
-    end
-
-    if ActiveRecord::VERSION::STRING.start_with?('3.2') ||
-        ActiveRecord::VERSION::STRING.start_with?('4.0') ||
-        ActiveRecord::VERSION::STRING.start_with?('4.1')
-      include ActiveRecordLessThanFourPointTwo
+    if ActiveRecord::VERSION::MAJOR < 4
+      include ActiveRecordLessThanFour
     else
-      include ActiveRecordFourPointTwoOrGreater
+      include ActiveRecordFourOrGreater
     end
   end
 end
