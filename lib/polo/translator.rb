@@ -38,8 +38,9 @@ module Polo
         next if intersection(instance.attributes.keys, fields).empty?
 
         fields.each do |field, strategy|
-          value = instance.attributes[field.to_s] || ''
-          instance.send("#{field}=", new_field_value(field, strategy, value))
+          if value = instance.attributes[field.to_s]
+            instance.send("#{field}=", new_field_value(field, strategy, value))
+          end
         end
       end
     end
