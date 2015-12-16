@@ -88,6 +88,20 @@ describe Polo do
 
         expect(inserts).to eq [ %q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'changeme')} ]
       end
+
+      it 'only scrambles instances with the obfuscate field defined' do
+        Polo.configure do
+          obfuscate :name,
+                    email: ->(e) { "#{e.split("@")[0]}_test@example.com" },
+                    title: ->(t) { t.chars.reverse!.join }
+        end
+
+        exp = Polo.explore(AR::Chef, 1, :recipes)
+
+        explore_statement = exp.join(';')
+        expect(explore_statement).to_not match('nettofarah@gmail.com')
+        expect(explore_statement).to_not match('Netto')
+      end
     end
 
     describe 'on_duplicate' do
