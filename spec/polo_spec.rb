@@ -102,6 +102,18 @@ describe Polo do
         expect(explore_statement).to_not match('nettofarah@gmail.com')
         expect(explore_statement).to_not match('Netto')
       end
+
+      it 'can target a specific field in a table' do
+        Polo.configure do
+          obfuscate 'ingredients.name' => -> (i) { "Secret" }
+        end
+
+        exp = Polo.explore(AR::Chef, 1, recipes: :ingredients)
+
+        explore_statement = exp.join(';')
+        expect(explore_statement).to match('Netto')
+        expect(explore_statement).to match('Secret')
+      end
     end
 
     describe 'on_duplicate' do
