@@ -139,7 +139,7 @@ Warning: This is not a security feature. Fields can still easily be rearranged b
 
 For more advanced obfuscation, you can pass in a custom obfuscation strategy. Polo will take in a lambda that can be used to transform sensitive data. 
 
-To target a column within a specific table an SQL selector may be used as the obfuscate key.
+Using a `:symbol` as an obfuscate key targets all columns of that name. Passing an SQL selector as a `String` will target columns within the specified table.
 
 ````ruby
 Polo.configure do
