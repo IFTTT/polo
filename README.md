@@ -137,14 +137,15 @@ Warning: This is not a security feature. Fields can still easily be rearranged b
 
 #### Advanced Obfuscation
 
-For more advanced obfuscation, you can pass in a custom obfuscation strategy.
-Polo will take in a lambda that can be used to transform sensitive data.
+For more advanced obfuscation, you can pass in a custom obfuscation strategy. Polo will take in a lambda that can be used to transform sensitive data. 
+
+To target a column within a specific table an SQL selector may be used as the obfuscate key.
 
 ````ruby
 Polo.configure do
   email_strategy = lambda {|e| "#{e.split("@")[0]}_test@example.com" }
   credit_card_strategy = lambda {|_| "4111111111111111"}
-  obfuscate({email: email_strategy, credit_card: credit_card_strategy})
+  obfuscate({'chefs.email' => email_strategy, credit_card: credit_card_strategy})
 end
 
 Polo::Traveler.explore(AR::Chef, 1)
