@@ -1,18 +1,11 @@
 require 'active_record'
 require 'polo/configuration'
+require 'polo/translator_base'
 
 module Polo
-  class SqlTranslator
-
-    def initialize(object, configuration=Configuration.new)
-      @record = object
-      @configuration = configuration
-    end
-
-    def to_sql
-      records = Array.wrap(@record)
-
-      sqls = records.map do |record|
+  class SqlTranslator < TranslatorBase
+    def translation
+      sqls = @records.map do |record|
         raw_sql(record)
       end
 
@@ -21,10 +14,10 @@ module Polo
       end
 
       if @configuration.on_duplicate_strategy == :override
-        sqls = on_duplicate_key_update(sqls, records)
+        sqls = on_duplicate_key_update(sqls, @records)
       end
 
-      sqls
+      sqls.uniq
     end
 
     private
