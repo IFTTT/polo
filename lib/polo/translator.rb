@@ -24,7 +24,11 @@ module Polo
     # Public: Translates SELECT queries into INSERTS.
     #
     def translate
-      @configuration.translator.new(instances, @configuration).translation
+      if @configuration.translator
+        @configuration.translator.new(instances, @configuration).translation
+      else
+        instances
+      end
     end
 
     def instances
