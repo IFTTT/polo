@@ -5,12 +5,17 @@ require 'polo/translator_base'
 module Polo
   class JsonTranslator < TranslatorBase
     def translation
-      @records.map do |record|
+      data = @records.map do |record|
         {
           table: record.class.table_name,
           attributes: record.attributes
         }
-      end.to_json
+      end
+      if @configuration.should_pretty_print
+        JSON.pretty_generate data
+      else
+        data.to_json
+      end
     end
   end
 end
