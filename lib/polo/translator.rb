@@ -32,19 +32,13 @@ module Polo
     end
 
     def instances
-      if @reads
-        @reads
-      else
-        active_record_instances = @selects.flat_map do |select|
-          select[:klass].find_by_sql(select[:sql]).to_a
-        end
+      records = @reads ? @reads : @selects.flat_map { |select| select[:klass].find_by_sql(select[:sql]).to_a }
 
-        if fields = @configuration.blacklist
-          obfuscate!(active_record_instances, fields)
-        end
-
-        active_record_instances
+      if fields = @configuration.blacklist
+        obfuscate!(records, fields)
       end
+
+      records
     end
 
     private
