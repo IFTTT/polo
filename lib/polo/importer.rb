@@ -16,7 +16,11 @@ module Polo
     # Public: Translates SELECT queries into INSERTS.
     #
     def read
-      @configuration.reader.new(@serialized, @configuration).read.uniq
+      if @configuration.reader
+        @configuration.reader.new(@serialized, @configuration).read.uniq
+      else
+        @serialized.uniq
+      end
     end
   end
 end
