@@ -1,12 +1,13 @@
-require 'active_record'
-require 'polo/configuration'
+# require 'active_record'
+# require 'polo/configuration'
 require 'csv'
 
 module Polo
-  class CSVtranslator
-    def intialize(table, csv_file)
-      @csv = csv_file
+  class CSVTranslator
+    def initialize(table, csv_file, configuration=Configuration.new)
+      # (.csv)$/.match(csv_file)? @csv = csv_file :
       @table = table
+      @configuration = configuration
     end
 
     def to_csv
