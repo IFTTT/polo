@@ -143,9 +143,19 @@ Using a `:symbol` as an obfuscate key targets all columns of that name. Passing 
 
 ````ruby
 Polo.configure do
-  email_strategy = lambda {|e| "#{e.split("@")[0]}_test@example.com" }
-  credit_card_strategy = lambda {|_| "4111111111111111"}
-  obfuscate({'chefs.email' => email_strategy, credit_card: credit_card_strategy})
+  email_strategy = lambda do |email|
+    first_part = email.split("@")[0]
+    "#{first_part}_test@example.com"
+  end
+  
+  credit_card_strategy = lambda do |credit_card|
+    "4111111111111111"
+  end
+  
+  obfuscate({
+    'chefs.email' => email_strategy, # This only applies to the "email" column in the "chefs" table
+    :credit_card  => credit_card_strategy # This applies to any column named "credit_card" across every table
+  })
 end
 
 Polo::Traveler.explore(AR::Chef, 1)
