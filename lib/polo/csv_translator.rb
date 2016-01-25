@@ -4,13 +4,11 @@ module Polo
   class CSVTranslator
 
     # Tool to translate table to csv file
-    # Future updates: translate CSV to table
 
-    def initialize(model, csv_file, configuration=Configuration.new)
+    def initialize(model, csv_file)
       raise ArgumentError, "file name must end in .csv" unless /(.csv)$/.match(csv_file)
       @csv = csv_file
       @model = model
-      @configuration = configuration
     end
 
     def to_csv
