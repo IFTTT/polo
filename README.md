@@ -143,13 +143,14 @@ Using a `:symbol` as an obfuscate key targets all columns of that name. Passing 
 
 ````ruby
 Polo.configure do
+
   email_strategy = lambda do |email|
     first_part = email.split("@")[0]
-    "#{first_part}_test@example.com"
+    "#{first_part}@test.com"
   end
   
   credit_card_strategy = lambda do |credit_card|
-    "4111111111111111"
+    "4123 4567 8910 1112"
   end
   
   obfuscate({
