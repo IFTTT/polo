@@ -80,7 +80,7 @@ module Polo
         connection = ActiveRecord::Base.connection
         values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
         values.each do |attribute, value|
-          column = record.column_for_attribute(attribute.name)
+          column = record.send(:column_for_attribute, attribute.name)
           values[attribute] = connection.type_cast(value, column)
         end
       end
