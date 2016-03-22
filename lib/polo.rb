@@ -1,6 +1,10 @@
 require "polo/version"
 require "polo/collector"
+require "polo/importer"
+require "polo/json_reader"
 require "polo/translator"
+require "polo/json_translator"
+require "polo/sql_translator"
 require "polo/configuration"
 
 module Polo
@@ -41,6 +45,10 @@ module Polo
     Traveler.collect(base_class, id, dependencies).translate(defaults)
   end
 
+  def self.read(serialized)
+    Reader.new(serialized).translate(defaults)
+  end
+
 
   # Public: Sets up global settings for Polo
   #
@@ -68,6 +76,16 @@ module Polo
     @configuration || configure
   end
 
+  class Reader
+    def initialize(serialized)
+      @serialized = serialized
+    end
+
+    def translate(configuration=Configuration.new)
+      reads = Importer.new(@serialized, configuration).read
+      Translator.with_reads(reads, configuration).translate
+    end
+  end
 
   class Traveler
 
@@ -81,7 +99,7 @@ module Polo
     end
 
     def translate(configuration=Configuration.new)
-      Translator.new(@selects, configuration).translate
+      Translator.with_selects(@selects, configuration).translate
     end
   end
 end

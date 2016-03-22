@@ -1,12 +1,18 @@
+require 'polo/json_reader'
+require 'polo/sql_translator'
+
 module Polo
 
   class Configuration
-    attr_reader :on_duplicate_strategy, :blacklist
+    attr_reader :on_duplicate_strategy, :blacklist, :translator, :reader, :should_pretty_print
 
     def initialize(options={})
-      options = { on_duplicate: nil, obfuscate: {} }.merge(options)
-      @on_duplicate_strategy = options[:on_duplicate]
+      options = { on_duplicate: nil, obfuscate: {}, use_translator: Polo::SqlTranslator, use_reader: Polo::JsonReader, pretty_print: true }.merge(options)
+      on_duplicate(options[:on_duplicate])
       obfuscate(options[:obfuscate])
+      use_translator(options[:use_translator])
+      use_reader(options[:use_reader])
+      pretty_print(options[:should_pretty_print])
     end
 
     # TODO: document this
@@ -32,6 +38,18 @@ module Polo
 
     def on_duplicate(strategy)
       @on_duplicate_strategy = strategy
+    end
+
+    def pretty_print(should_pretty_print)
+      @should_pretty_print = should_pretty_print
+    end
+
+    def use_translator(translator)
+      @translator = translator
+    end
+
+    def use_reader(reader)
+      @reader = reader
     end
   end
 end
