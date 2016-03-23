@@ -1,10 +1,11 @@
 module Polo
 
   class Configuration
-    attr_reader :on_duplicate_strategy, :blacklist
+    attr_reader :on_duplicate_strategy, :blacklist, :adapter
 
     def initialize(options={})
-      options = { on_duplicate: nil, obfuscate: {} }.merge(options)
+      options = { on_duplicate: nil, obfuscate: {}, adapter: :mysql }.merge(options)
+      @adapter = options[:adapter]
       @on_duplicate_strategy = options[:on_duplicate]
       obfuscate(options[:obfuscate])
     end
@@ -32,6 +33,10 @@ module Polo
 
     def on_duplicate(strategy)
       @on_duplicate_strategy = strategy
+    end
+
+    def set_adapter(db)
+      @adapter = db
     end
   end
 end

@@ -1,52 +1,46 @@
 require 'active_record'
 require 'polo/configuration'
+require 'polo/adapters/mysql'
+require 'polo/adapters/postgres'
 
 module Polo
   class SqlTranslator
 
-    def initialize(object, configuration=Configuration.new)
+    def initialize(object, configuration = Configuration.new)
       @record = object
       @configuration = configuration
+
+      case @configuration.adapter
+      when :mysql
+        @adapter = Polo::Adapters::MySQL.new
+      when :postgres
+        @adapter = Polo::Adapters::Postgres.new
+      else
+        raise "Unknown SQL adapter: #{@configuration.adapter}"
+      end
     end
 
     def to_sql
-      records = Array.wrap(@record)
+      case @configuration.on_duplicate_strategy
+      when :ignore
+        @adapter.ignore_transform(inserts, records)
+      when :override
+        @adapter.on_duplicate_key_update(inserts, records)
+      else inserts
+      end
+    end
 
-      sqls = records.map do |record|
+    def records
+      Array.wrap(@record)
+    end
+
+    def inserts
+      records.map do |record|
         raw_sql(record)
       end
-
-      if @configuration.on_duplicate_strategy == :ignore
-        sqls = ignore_transform(sqls)
-      end
-
-      if @configuration.on_duplicate_strategy == :override
-        sqls = on_duplicate_key_update(sqls, records)
-      end
-
-      sqls
     end
 
     private
-
-    def on_duplicate_key_update(sqls, records)
-      insert_and_record = sqls.zip(records)
-      insert_and_record.map do |insert, record|
-        values_syntax = record.attributes.keys.map do |key|
-          "#{key} = VALUES(#{key})"
-        end
-
-        on_dup_syntax = "ON DUPLICATE KEY UPDATE #{values_syntax.join(', ')}"
-
-        "#{insert} #{on_dup_syntax}"
-      end
-    end
-
-    def ignore_transform(inserts)
-      inserts.map do |insert|
-        insert.gsub("INSERT", "INSERT IGNORE")
-      end
-    end
 
     # Internal: Generates an insert SQL statement for a given record
     #
