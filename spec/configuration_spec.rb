@@ -2,6 +2,12 @@ require 'spec_helper'
 
 describe Polo::Configuration do
 
+  describe 'adapter' do
+    it 'defaults to mysql' do
+      expect(Polo.defaults.adapter).to be :mysql
+    end
+  end
+
   describe 'on_duplicate' do
     it 'defaults to nothing' do
       expect(Polo.defaults.on_duplicate_strategy).to be nil
