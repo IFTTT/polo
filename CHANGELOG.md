@@ -1,3 +1,22 @@
+## 0.3.0
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- [#30](https://github.com/IFTTT/polo/pull/30) Advanced obfuscation
+- [#37](https://github.com/IFTTT/polo/pull/37) Custom adapters for Postgres and MySQL
+
+### Fixed
+
+- [#26](https://github.com/IFTTT/polo/pull/26) Postgres - Use ActiveRecord methods to generate INSERT SQLs
+- [#25](https://github.com/IFTTT/polo/pull/25) Fix custom strategies bug
+- [#28](https://github.com/IFTTT/polo/pull/28) Only obfuscate fields when they are present
+- [#35](https://github.com/IFTTT/polo/pull/35) Better support for Rails 4.0
+- [#31](https://github.com/IFTTT/polo/pull/31) Fix link to Code of Conduct
+
 ## 0.2.0
 
 ### Breaking Changes
