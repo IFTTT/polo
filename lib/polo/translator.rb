@@ -46,8 +46,8 @@ module Polo
 
           correct_table = table.nil? || instance.class.table_name == table
 
-          if correct_table && value = instance.attributes[field]
-            instance.send("#{field}=", new_field_value(field, strategy, value))
+          if correct_table && instance.attributes[field]
+            instance.send("#{field}=", new_field_value(field, strategy, instance))
           end
         end
       end
@@ -65,11 +65,12 @@ module Polo
       attrs & fields.map { |pair| field_name(pair.first) }
     end
 
-    def new_field_value(field, strategy, value)
+    def new_field_value(field, strategy, instance)
+      value = instance.attributes[field]
       if strategy.nil?
         value.split("").shuffle.join
       else
-        strategy.call(value)
+        strategy.arity == 1 ? strategy.call(value) : strategy.call(value, instance)
       end
     end
   end

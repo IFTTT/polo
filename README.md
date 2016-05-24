@@ -137,7 +137,7 @@ Warning: This is not a security feature. Fields can still easily be rearranged b
 
 #### Advanced Obfuscation
 
-For more advanced obfuscation, you can pass in a custom obfuscation strategy. Polo will take in a lambda that can be used to transform sensitive data. 
+For more advanced obfuscation, you can pass in a custom obfuscation strategy. Polo will take in a lambda that can be used to transform sensitive data.
 
 Using a `:symbol` as an obfuscate key targets all columns of that name. Passing an SQL selector as a `String` will target columns within the specified table.
 
@@ -148,14 +148,21 @@ Polo.configure do
     first_part = email.split("@")[0]
     "#{first_part}@test.com"
   end
-  
+
   credit_card_strategy = lambda do |credit_card|
     "4123 4567 8910 1112"
   end
-  
+
+  # If you need the context of the record for its fields, it is accessible
+  # in the second argument of the strategy
+  social_security_strategy = lambda do |ssn, instance|
+    sprintf("%09d", instance.id)
+  end
+
   obfuscate({
     'chefs.email' => email_strategy, # This only applies to the "email" column in the "chefs" table
-    :credit_card  => credit_card_strategy # This applies to any column named "credit_card" across every table
+    :credit_card  => credit_card_strategy, # This applies to any column named "credit_card" across every table
+    :ssn_strategy => social_security_strategy
   })
 end
 
@@ -200,4 +207,3 @@ $ bundle exec appraisal rake
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
