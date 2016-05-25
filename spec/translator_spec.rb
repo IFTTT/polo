@@ -47,6 +47,16 @@ describe Polo::Translator do
         end
       end
 
+      context "custom obfuscation strategy using instance context" do
+        let(:obfuscated_fields) do
+          { email: lambda { |field, instance| "#{instance.name}@example.com" } }
+        end
+
+        it "replaces contents of field according to the supplied lambda" do
+          expect(netto.email.to_s).to eq "Netto@example.com"
+        end
+      end
+
       context "no strategy passed in" do
         let(:obfuscated_fields) { [:email] }
 
