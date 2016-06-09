@@ -1,3 +1,13 @@
+## 0.4.0
+
+### Breaking Changes
+
+- None
+
+### Added
+- [#40](https://github.com/IFTTT/polo/pull/40) Support for optional 2nd instance argument
+
+
 ## 0.3.0
 
 ### Breaking Changes
