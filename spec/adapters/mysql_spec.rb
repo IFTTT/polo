@@ -29,7 +29,7 @@ describe Polo::Adapters::MySQL do
   describe '#on_duplicate_key_update' do
     it 'appends ON DUPLICATE KEY UPDATE with all values to the current INSERT statement' do
       insert_netto = [
-        %q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com') ON DUPLICATE KEY UPDATE id = VALUES(id), name = VALUES(name), email = VALUES(email)}
+        %q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com') ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `name` = VALUES(`name`), `email` = VALUES(`email`)}
       ]
 
       inserts = translator.inserts
