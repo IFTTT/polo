@@ -1,3 +1,12 @@
+## 0.4.1
+
+### Breaking Changes
+
+- None
+
+### Fixed
+- [#42](https://github.com/IFTTT/polo/pull/42) Escape columns in DUPLICATE KEY statements
+
 ## 0.4.0
 
 ### Breaking Changes
