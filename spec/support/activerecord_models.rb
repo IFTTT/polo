@@ -8,11 +8,16 @@ module AR
   end
 
   class Ingredient < ActiveRecord::Base
+    has_and_belongs_to_many :vendors
   end
 
   class RecipesIngredient < ActiveRecord::Base
     belongs_to :recipe
     belongs_to :ingredient
+  end
+
+  class Vendor < ActiveRecord::Base
+    has_and_belongs_to_many :ingredients
   end
 
   class Restaurant < ActiveRecord::Base

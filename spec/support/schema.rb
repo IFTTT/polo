@@ -11,6 +11,15 @@ ActiveRecord::Schema.define do
     t.column :quantity, :string
   end
 
+  create_table :vendors, force: true do |t|
+    t.column :name, :string
+  end
+
+  create_table :ingredients_vendors, force: true do |t|
+    t.column :ingredient_id, :integer
+    t.column :vendor_id, :integer
+  end
+
   create_table :recipes_ingredients, force: true do |t|
     t.column :recipe_id, :integer
     t.column :ingredient_id, :integer

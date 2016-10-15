@@ -7,9 +7,24 @@ module TestData
         r.ingredients.create(name: 'Cheese', quantity: '1 slice')
       end
 
+      patty = AR::Ingredient.create(name: 'Patty', quantity: '1')
+      cheese = AR::Ingredient.create(name: 'Cheese', quantity: '2 slices')
+
       AR::Recipe.create(title: 'Cheese Burger', chef: netto).tap do |r|
-        r.ingredients.create(name: 'Patty', quantity: '1')
-        r.ingredients.create(name: 'Cheese', quantity: '2 slices')
+        r.ingredients << patty
+        r.ingredients << cheese
+        r.save!
+      end
+
+      AR::Vendor.create(name: 'Corner Store').tap do |v|
+        v.ingredients << patty
+        v.ingredients << cheese
+        v.save!
+      end
+
+      AR::Vendor.create(name: 'Trader Joes').tap do |v|
+        v.ingredients << cheese
+        v.save!
       end
     end
 

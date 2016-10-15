@@ -16,7 +16,10 @@ module Polo
     # Public: Translates SELECT queries into INSERTS.
     #
     def translate
-      SqlTranslator.new(instances, @configuration).to_sql.uniq
+      loaded_instances = instances
+      sql = SqlTranslator.new(loaded_instances, @configuration).to_sql.uniq
+      sql << load_has_and_belongs_to_many_pending_records(loaded_instances)
+      sql.flatten
     end
 
     def instances
@@ -32,6 +35,14 @@ module Polo
     end
 
     private
+
+    def load_has_and_belongs_to_many_pending_records(instances)
+      require 'byebug'
+      debugger
+      instances.map do |instance|
+        #instance.association(:)
+      end
+    end
 
     def obfuscate!(instances, fields)
       instances.each do |instance|
