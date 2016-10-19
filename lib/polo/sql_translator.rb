@@ -70,7 +70,6 @@ module Polo
     # 'type_cast' call are necessary.
     #
     module ActiveRecordFour
-
       def insert_values(record)
         connection = ActiveRecord::Base.connection
         values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
@@ -88,13 +87,18 @@ module Polo
     # We now use the type_caster from the arel_table.
     #
     module ActiveRecordFive
-      def insert_values(record)
-        type_caster = record.class.arel_table.send(:type_caster)
+      # Based on the codepath used in Rails 5
+      def raw_sql(record)
         values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
-        values.each do |attribute, value|
-          values[attribute] = type_caster.type_cast_for_database(attribute.name, value)
+        model = record.class
+        substitutes, binds = model.unscoped.substitute_values(values)
+
+        insert_manager = model.arel_table.create_insert
+        insert_manager.insert substitutes
+
+        model.connection.unprepared_statement do
+          model.connection.to_sql(insert_manager, binds)
         end
-        values
       end
     end
 
@@ -103,7 +107,7 @@ module Polo
     elsif ActiveRecord::VERSION::MAJOR == 4
       include ActiveRecordFour
     else
-      include ActiveRecordFive
+      prepend ActiveRecordFive
     end
   end
 end
