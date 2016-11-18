@@ -69,7 +69,8 @@ module Polo
     # wouldn't be properly serialized automatically. That's why explict
     # 'type_cast' call are necessary.
     #
-    module ActiveRecordFourOrGreater
+    module ActiveRecordFour
+
       def insert_values(record)
         connection = ActiveRecord::Base.connection
         values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
@@ -80,10 +81,29 @@ module Polo
       end
     end
 
+    # Internal: Returns an object's attribute definitions along with
+    # their set values (for Rails >= 5.x).
+    #
+    # Serializers have changed again in rails 5.
+    # We now use the type_caster from the arel_table.
+    #
+    module ActiveRecordFive
+      def insert_values(record)
+        type_caster = record.class.arel_table.send(:type_caster)
+        values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
+        values.each do |attribute, value|
+          values[attribute] = type_caster.type_cast_for_database(attribute.name, value)
+        end
+        values
+      end
+    end
+
     if ActiveRecord::VERSION::MAJOR < 4
       include ActiveRecordLessThanFour
+    elsif ActiveRecord::VERSION::MAJOR == 4
+      include ActiveRecordFour
     else
-      include ActiveRecordFourOrGreater
+      include ActiveRecordFive
     end
   end
 end

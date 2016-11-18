@@ -19,7 +19,7 @@ describe Polo do
   end
 
   it 'generates insert queries for dependencies' do
-    if ActiveRecord::VERSION::STRING.start_with?('4.2')
+    if ActiveRecord::VERSION::STRING >= "4.2"
       serialized_nil = "NULL"
     else
       serialized_nil = "'null'"
