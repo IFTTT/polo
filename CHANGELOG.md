@@ -1,3 +1,13 @@
+## 0.5
+
+### Breaking Changes
+
+- None
+
+### Added
+- [#43](https://github.com/IFTTT/polo/pull/43) Rails 5 support
+- [#44](https://github.com/IFTTT/polo/pull/44) Remove all Rails 5 deprecation notices
+
 ## 0.4.1
 
 ### Breaking Changes
