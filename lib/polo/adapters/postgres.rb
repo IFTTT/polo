@@ -9,7 +9,7 @@ module Polo
       end
 
       # Internal: Transforms an INSERT with PostgreSQL-specific syntax. Ignores
-      #           records that alread exist in the table. To do this, it uses
+      #           records that already exist in the table. To do this, it uses
       #           a heuristic, i.e. checks if there is a record with the same id
       #           in the table.
       #           See: http://stackoverflow.com/a/6527838/32816
