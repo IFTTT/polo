@@ -24,7 +24,7 @@ module Polo
           table_name = record.class.arel_table.name
           id = record[:id]
           insert = insert.gsub(/VALUES \((.+)\)$/m, 'SELECT \\1')
-          insert << " WHERE NOT EXISTS (SELECT 1 FROM #{table_name} WHERE id=#{id});"
+          insert << " WHERE NOT EXISTS (SELECT 1 FROM \"#{table_name}\" WHERE id='#{id}');"
         end
       end
     end

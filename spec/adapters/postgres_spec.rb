@@ -23,7 +23,7 @@ describe Polo::Adapters::Postgres do
   describe '#ignore_transform' do
     it 'transforms INSERT by appending WHERE NOT EXISTS clause' do
 
-      insert_netto = [%q{INSERT INTO "chefs" ("id", "name", "email") SELECT 1, 'Netto', 'nettofarah@gmail.com' WHERE NOT EXISTS (SELECT 1 FROM chefs WHERE id=1);}]
+      insert_netto = [%q{INSERT INTO "chefs" ("id", "name", "email") SELECT 1, 'Netto', 'nettofarah@gmail.com' WHERE NOT EXISTS (SELECT 1 FROM "chefs" WHERE id='1');}]
 
       records = translator.records
       inserts = translator.inserts
