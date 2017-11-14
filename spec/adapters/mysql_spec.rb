@@ -37,5 +37,15 @@ describe Polo::Adapters::MySQL do
       translated_sql = adapter.on_duplicate_key_update(inserts, records)
       expect(translated_sql).to eq(insert_netto)
     end
+    it 'works for hash-values instead of ActiveRecord instances' do
+      insert_netto = [
+        %q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com') ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `name` = VALUES(`name`), `email` = VALUES(`email`)}
+      ]
+
+      inserts = translator.inserts
+      records = [{table_name: "chefs", values: { id: 1, name: "Netto", email: "nettofarah@gmail.com"}}]
+      translated_sql = adapter.on_duplicate_key_update(inserts, records)
+      expect(translated_sql).to eq(insert_netto)
+    end
   end
 end
