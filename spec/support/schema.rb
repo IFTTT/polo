@@ -35,4 +35,8 @@ ActiveRecord::Schema.define do
   create_table :people, primary_key: :ssn, force: true do |t|
     t.column :name, :string
   end
+
+  create_table :employees, force: true do |t|
+    t.column :name, :string
+  end
 end
