@@ -89,7 +89,7 @@ module Polo
     module ActiveRecordFive
       # Based on the codepath used in Rails 5
       def raw_sql(record)
-        values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
+        values = record.send(:arel_attributes_with_values_for_create, record.class.column_names)
         model = record.class
         substitutes, binds = model.unscoped.substitute_values(values)
 
