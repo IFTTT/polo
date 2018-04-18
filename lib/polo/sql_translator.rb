@@ -72,7 +72,7 @@ module Polo
     module ActiveRecordFour
       def insert_values(record)
         connection = ActiveRecord::Base.connection
-        values = record.send(:arel_attributes_with_values_for_create, record.attribute_names)
+        values = record.send(:arel_attributes_with_values_for_create, connection.schema_cache.columns(record.class.table_name).map(&:name))
         values.each do |attribute, value|
           column = record.send(:column_for_attribute, attribute.name)
           values[attribute] = connection.type_cast(value, column)

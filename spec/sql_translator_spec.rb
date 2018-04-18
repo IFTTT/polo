@@ -23,8 +23,21 @@ describe Polo::SqlTranslator do
   end
 
   it 'encodes attributes not backed by a database column correctly' do
-    recipe = AR::Employee.create(name: 'John Doe', on_vacation: true)
-    recipe_to_sql = Polo::SqlTranslator.new(recipe).to_sql.first
-    expect(recipe_to_sql).to_not include('on_vacation')
+    if Gem.loaded_specs["activerecord"].version < Gem::Version.new("4.2.1")
+      skip "the attributes API was included in rails starting in 4.2.1"
+    elsif Gem.loaded_specs["activerecord"].version >= Gem::Version.new("4.2.1") &&
+        Gem.loaded_specs["activerecord"].version < Gem::Version.new("5.0.0")
+      class Employee < ActiveRecord::Base
+        attribute :on_vacation, Type::Boolean.new
+      end
+    else
+      class Employee < ActiveRecord::Base
+        attribute :on_vacation, :boolean
+      end
+    end
+
+    employee = Employee.create(name: 'John Doe', on_vacation: true)
+    employee_to_sql = Polo::SqlTranslator.new(employee).to_sql.first
+    expect(employee_to_sql).to_not include('on_vacation')
   end
 end
