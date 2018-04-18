@@ -30,10 +30,6 @@ module AR
     has_one  :restaurant, foreign_key: 'owner_id'
   end
 
-  class Employee < ActiveRecord::Base
-    attribute :on_vacation
-  end
-
   class Person < ActiveRecord::Base
     self.primary_key = :ssn
   end

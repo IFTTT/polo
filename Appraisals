@@ -11,9 +11,9 @@ appraise "rails41" do
 end
 
 appraise "rails42" do
-  gem "activerecord", "4.2.3"
+  gem "activerecord", "4.2.10"
 end
 
 appraise "rails50" do
-  gem "activerecord", "5.0.0"
+  gem "activerecord", "5.0.7"
 end
