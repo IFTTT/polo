@@ -23,10 +23,9 @@ describe Polo::SqlTranslator do
   end
 
   it 'encodes attributes not backed by a database column correctly' do
-    if Gem.loaded_specs["activerecord"].version < Gem::Version.new("4.2.1")
+    if ActiveRecord::VERSION::STRING < "4.2.1"
       skip "the attributes API was included in rails starting in 4.2.1"
-    elsif Gem.loaded_specs["activerecord"].version >= Gem::Version.new("4.2.1") &&
-        Gem.loaded_specs["activerecord"].version < Gem::Version.new("5.0.0")
+    elsif ActiveRecord::VERSION::STRING >= "4.2.1" && ActiveRecord::VERSION::STRING < "5.0.0"
       class Employee < ActiveRecord::Base
         attribute :on_vacation, Type::Boolean.new
       end
