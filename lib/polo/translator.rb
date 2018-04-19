@@ -24,7 +24,8 @@ module Polo
         select.klass.find_by_sql(select.sql).to_a
       end
 
-      if (fields = @configuration.blacklist) && !fields.empty?
+      fields = @configuration.blacklist
+      if fields.present?
         active_record_instances = active_record_instances.map { |instance| obfuscate!(instance, fields) }
       end
 
