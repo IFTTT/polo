@@ -1,15 +1,11 @@
 module Polo
   class Collector
-    @@subscriber = nil
-
+    SqlRecord = Struct.new(:klass, :sql)
     def initialize(base_class, id, dependency_tree={})
       @base_class = base_class
       @id = id
       @dependency_tree = dependency_tree
-      @selects = []
-      # If a previous Brillo instance has subscribed, unsubscribe.
-      # Unfortunately we can't use the block scoped syntax because of the lazy enumerable
-      end_subscriber!
+      @selects = Set.new
     end
 
     # Public: Traverses the dependency tree and collects every SQL query.
@@ -18,35 +14,27 @@ module Polo
     # ActiveSupport::Notifications block and collecting every generate SQL query.
     #
     def collect
-      start_subscriber!
-      enumerable = nil
-      unprepared_statement do
-        base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
+      base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
+      enumerable = Enumerator.new do |yielder|
         collect_sql(@base_class, base_finder.to_sql)
-        enumerable = Enumerator::Lazy.new(base_finder.find_in_batches.with_index) do |yielder, batch, batch_index|
-          # Expose each select to the enumerated block
-          @selects.compact.each do |selected|
-            yielder << selected
+        unprepared_statement do
+          ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
+            base_finder.find_in_batches.with_index do |batch, batch_index|
+              puts "BATCH #{batch_index}"
+              # Expose each select to the enumerator
+              @selects.each do |selected|
+                yielder.yield(selected)
+              end
+              # Now reset the accumulator (don't hog memory!)
+              @selects = Set.new
+            end
           end
-          # Now reset the accumulator (don't hog memory!)
-          @selects = []
         end
       end
-      enumerable
+      enumerable.to_enum.lazy
     end
 
     private
-
-    def start_subscriber!
-      collector_instance = collector
-      @@subscriber = ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
-        collector_instance.call(*args)
-      end
-    end
-
-    def end_subscriber!
-      ActiveSupport::Notifications.unsubscribe(@@subscriber) if @@subscriber
-    end
 
     # Internal: Store ActiveRecord queries in @selects
     #
@@ -57,6 +45,7 @@ module Polo
     def collector
       lambda do |name, start, finish, id, payload|
         return unless payload[:name] =~ /^(.*) Load$/
+        puts "ALL THAT #{payload[:sql]}"
         begin
           class_name = $1.constantize
           sql = payload[:sql]
@@ -68,10 +57,7 @@ module Polo
     end
 
     def collect_sql(klass, sql)
-      @selects << {
-        klass: klass,
-        sql: sql
-      }
+      @selects << SqlRecord.new(klass, sql)
     end
 
     def unprepared_statement

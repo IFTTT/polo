@@ -21,7 +21,7 @@ module Polo
 
     def instances
       active_record_instances = @selects.flat_map do |select|
-        select[:klass].find_by_sql(select[:sql]).to_a
+        select.klass.find_by_sql(select.sql).to_a
       end
 
       if (fields = @configuration.blacklist) && !fields.empty?

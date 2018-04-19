@@ -4,10 +4,7 @@ describe Polo::Translator do
 
   let(:email) { 'nettofarah@gmail.com' }
   let(:finder) do
-    {
-      klass: AR::Chef,
-      sql: AR::Chef.where(email: email).to_sql
-    }
+    Polo::Collector::SqlRecord.new(AR::Chef, AR::Chef.where(email: email).to_sql)
   end
 
   before(:all) do
