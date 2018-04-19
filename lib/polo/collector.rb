@@ -20,17 +20,18 @@ module Polo
         unprepared_statement do
           ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
             base_finder.find_in_batches.with_index do |batch, batch_index|
-              puts "BATCH #{batch_index}"
               # Expose each select to the enumerator
-              @selects.each do |selected|
-                yielder.yield(selected)
-              end
+              yielder.yield(@selects)
               # Now reset the accumulator (don't hog memory!)
               @selects = Set.new
             end
           end
         end
       end
+      # By using a lazy enumerator, we make it possible to garbage collect records
+      # as we process a batch, so long as the end user accesses the data via #each
+      # and does not maintain references to previous rows. Example:
+      #   Polo.explore(klass, ids, associations).each { |row| file.puts(row) }
       enumerable.to_enum.lazy
     end
 
@@ -45,7 +46,6 @@ module Polo
     def collector
       lambda do |name, start, finish, id, payload|
         return unless payload[:name] =~ /^(.*) Load$/
-        puts "ALL THAT #{payload[:sql]}"
         begin
           class_name = $1.constantize
           sql = payload[:sql]

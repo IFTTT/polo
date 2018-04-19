@@ -38,7 +38,11 @@ module Polo
   #   [ :books, { author: :avatar } ]
   #
   def self.explore(base_class, id, dependencies={})
-    Traveler.collect(base_class, id, dependencies).translate(defaults)
+    Traveler.collect_in_batches(base_class, id, dependencies).flat_map do |traveler|
+      # Within each batch, unique-ify, as Rails batch processing seems to cause
+      # repeat queries that lead to erronous duplicate rows.
+      traveler.translate(defaults).uniq
+    end
   end
 
 
@@ -71,9 +75,9 @@ module Polo
 
   class Traveler
 
-    def self.collect(base_class, id, dependencies={})
-      selects = Collector.new(base_class, id, dependencies).collect
-      new(selects)
+    def self.collect_in_batches(base_class, id, dependencies={})
+      select_batches = Collector.new(base_class, id, dependencies).collect
+      select_batches.map { |selects| new(selects) }
     end
 
     def initialize(selects)
