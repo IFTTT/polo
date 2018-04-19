@@ -31,7 +31,11 @@ module Polo
     end
 
     def records
-      Array.wrap(@record)
+      if @record.is_a?(Enumerator)
+        @record
+      else
+        Array.wrap(@record)
+      end
     end
 
     def inserts

@@ -16,7 +16,7 @@ module Polo
     # Public: Translates SELECT queries into INSERTS.
     #
     def translate
-      SqlTranslator.new(instances, @configuration).to_sql.uniq
+      SqlTranslator.new(instances, @configuration).to_sql
     end
 
     def instances
@@ -24,8 +24,8 @@ module Polo
         select[:klass].find_by_sql(select[:sql]).to_a
       end
 
-      if fields = @configuration.blacklist
-        obfuscate!(active_record_instances, fields)
+      if (fields = @configuration.blacklist) && !fields.empty?
+        active_record_instances = active_record_instances.map { |instance| obfuscate!(instance, fields) }
       end
 
       active_record_instances
@@ -33,24 +33,24 @@ module Polo
 
     private
 
-    def obfuscate!(instances, fields)
-      instances.each do |instance|
-        next if intersection(instance.attributes.keys, fields).empty?
+    def obfuscate!(instance, fields)
+      instance if intersection(instance.attributes.keys, fields).empty?
 
-        fields.each do |field, strategy|
-          field = field.to_s
+      fields.each do |field, strategy|
+        field = field.to_s
 
-          if table = table_name(field)
-            field = field_name(field)
-          end
+        if table = table_name(field)
+          field = field_name(field)
+        end
 
-          correct_table = table.nil? || instance.class.table_name == table
+        correct_table = table.nil? || instance.class.table_name == table
 
-          if correct_table && instance.attributes[field]
-            instance.send("#{field}=", new_field_value(field, strategy, instance))
-          end
+        if correct_table && instance.attributes[field]
+          instance.send("#{field}=", new_field_value(field, strategy, instance))
         end
       end
+
+      instance
     end
 
     def field_name(field)

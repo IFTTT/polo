@@ -7,13 +7,13 @@ describe Polo do
   end
 
   it 'generates an insert query for the base object' do
-    exp = Polo.explore(AR::Chef, 1)
+    exp = Polo.explore(AR::Chef, 1).to_a
     insert = %q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com')}
     expect(exp).to include(insert)
   end
 
   it 'generates an insert query for the objects with non-standard primary keys' do
-    exp = Polo.explore(AR::Person, 1)
+    exp = Polo.explore(AR::Person, 1).to_a
     insert = %q{INSERT INTO "people" ("ssn", "name") VALUES (1, 'John Doe')}
     expect(exp).to include(insert)
   end
@@ -28,7 +28,7 @@ describe Polo do
     turkey_insert        = %Q{INSERT INTO "recipes" ("id", "title", "num_steps", "chef_id", "metadata") VALUES (1, 'Turkey Sandwich', NULL, 1, #{serialized_nil})}
     cheese_burger_insert = %Q{INSERT INTO "recipes" ("id", "title", "num_steps", "chef_id", "metadata") VALUES (2, 'Cheese Burger', NULL, 1, #{serialized_nil})}
 
-    inserts = Polo.explore(AR::Chef, 1, [:recipes])
+    inserts = Polo.explore(AR::Chef, 1, [:recipes]).to_a
 
     expect(inserts).to include(turkey_insert)
     expect(inserts).to include(cheese_burger_insert)
@@ -40,7 +40,7 @@ describe Polo do
     one_cheese  = %q{INSERT INTO "ingredients" ("id", "name", "quantity") VALUES (2, 'Cheese', '1 slice')}
     two_cheeses = %q{INSERT INTO "ingredients" ("id", "name", "quantity") VALUES (4, 'Cheese', '2 slices')}
 
-    inserts = Polo.explore(AR::Chef, 1, :recipes => :ingredients)
+    inserts = Polo.explore(AR::Chef, 1, :recipes => :ingredients).to_a
 
     expect(inserts).to include(patty)
     expect(inserts).to include(turkey)
@@ -56,7 +56,7 @@ describe Polo do
       %q{INSERT INTO "recipes_ingredients" ("id", "recipe_id", "ingredient_id") VALUES (4, 2, 4)},
     ]
 
-    inserts = Polo.explore(AR::Chef, 1, :recipes => :ingredients)
+    inserts = Polo.explore(AR::Chef, 1, :recipes => :ingredients).to_a
 
     many_to_many_inserts.each do |many_to_many_insert|
       expect(inserts).to include(many_to_many_insert)
@@ -71,7 +71,7 @@ describe Polo do
           obfuscate(:email)
         end
 
-        exp = Polo.explore(AR::Chef, 1)
+        exp = Polo.explore(AR::Chef, 1).to_a
         insert = /INSERT INTO "chefs" \("id", "name", "email"\) VALUES \(1, 'Netto', (.+)\)/
         scrambled_email = insert.match(exp.first)[1]
 
@@ -84,7 +84,7 @@ describe Polo do
           obfuscate(email: lambda { |_| 'changeme' })
         end
 
-        inserts = Polo.explore(AR::Chef, 1)
+        inserts = Polo.explore(AR::Chef, 1).to_a
 
         expect(inserts).to eq [ %q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'changeme')} ]
       end
@@ -96,7 +96,7 @@ describe Polo do
                     title: ->(t) { t.chars.reverse!.join }
         end
 
-        exp = Polo.explore(AR::Chef, 1, :recipes)
+        exp = Polo.explore(AR::Chef, 1, :recipes).to_a
 
         explore_statement = exp.join(';')
         expect(explore_statement).to_not match('nettofarah@gmail.com')
@@ -108,7 +108,7 @@ describe Polo do
           obfuscate 'ingredients.name' => -> (i) { "Secret" }
         end
 
-        exp = Polo.explore(AR::Chef, 1, recipes: :ingredients)
+        exp = Polo.explore(AR::Chef, 1, recipes: :ingredients).to_a
 
         explore_statement = exp.join(';')
         expect(explore_statement).to match('Netto')
@@ -122,7 +122,7 @@ describe Polo do
           on_duplicate(:ignore)
         end
 
-        exp = Polo.explore(AR::Chef, 1)
+        exp = Polo.explore(AR::Chef, 1).to_a
         insert = /INSERT IGNORE INTO "chefs" \("id", "name", "email"\) VALUES \(1, 'Netto', (.+)\)/
         expect(insert).to match(exp.first)
       end
