@@ -12,13 +12,13 @@ describe Polo::SqlTranslator do
 
   it 'translates records to inserts' do
     insert_netto = [%q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com')}]
-    netto_to_sql = Polo::SqlTranslator.new(netto).to_sql
+    netto_to_sql = Polo::SqlTranslator.new([netto].to_enum).to_sql
     expect(netto_to_sql).to eq(insert_netto)
   end
 
   it 'encodes serialized fields correctly' do
     recipe = AR::Recipe.create(title: 'Polenta', metadata: { quality: 'ok' })
-    recipe_to_sql = Polo::SqlTranslator.new(recipe).to_sql.first
+    recipe_to_sql = Polo::SqlTranslator.new([recipe].to_enum).to_sql.first
     expect(recipe_to_sql).to include(%q{'{"quality":"ok"}'}) # JSON, not YAML
   end
 
@@ -37,7 +37,7 @@ describe Polo::SqlTranslator do
     end
 
     employee = Employee.create(name: 'John Doe', on_vacation: true)
-    employee_to_sql = Polo::SqlTranslator.new(employee).to_sql.first
+    employee_to_sql = Polo::SqlTranslator.new([employee].to_enum).to_sql.first
     expect(employee_to_sql).to_not include('on_vacation')
   end
 end

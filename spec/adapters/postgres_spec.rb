@@ -12,7 +12,7 @@ describe Polo::Adapters::Postgres do
     TestData.create_netto
   end
 
-  let(:translator) { Polo::SqlTranslator.new(netto, Polo::Configuration.new(adapter: :postgres)) }
+  let(:translator) { Polo::SqlTranslator.new([netto].to_enum, Polo::Configuration.new(adapter: :postgres)) }
 
   describe '#on_duplicate_key_update' do
     it 'should raise an error' do

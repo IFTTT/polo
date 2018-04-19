@@ -5,9 +5,10 @@ require 'polo/adapters/postgres'
 
 module Polo
   class SqlTranslator
+    attr_reader :records
 
-    def initialize(object, configuration = Configuration.new)
-      @record = object
+    def initialize(records, configuration = Configuration.new)
+      @records = records
       @configuration = configuration
 
       case @configuration.adapter
@@ -27,14 +28,6 @@ module Polo
       when :override
         @adapter.on_duplicate_key_update(inserts, records)
       else inserts
-      end
-    end
-
-    def records
-      if @record.is_a?(Enumerator)
-        @record
-      else
-        Array.wrap(@record)
       end
     end
 

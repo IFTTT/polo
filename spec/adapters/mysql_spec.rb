@@ -12,7 +12,7 @@ describe Polo::Adapters::MySQL do
     TestData.create_netto
   end
 
-  let(:translator) { Polo::SqlTranslator.new(netto, Polo::Configuration.new(adapter: :mysql)) }
+  let(:translator) { Polo::SqlTranslator.new([netto].to_enum, Polo::Configuration.new(adapter: :mysql)) }
 
   describe '#ignore_transform' do
     it 'appends the IGNORE command after INSERTs' do
