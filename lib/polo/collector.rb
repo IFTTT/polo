@@ -15,11 +15,13 @@ module Polo
     #
     def collect
       base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
+      # If we are not also looking up relationships, we can process many more records at once
+      batch_size = @dependency_tree.blank? ? 10_000 : 1_000
       enumerable = Enumerator.new do |yielder|
         collect_sql(@base_class, base_finder.to_sql)
         unprepared_statement do
           ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
-            base_finder.find_in_batches.with_index do |batch, batch_index|
+            base_finder.find_in_batches(batch_size: batch_size).with_index do |batch, batch_index|
               # Expose each select to the enumerator
               yielder.yield(@selects)
               # Now reset the accumulator (don't hog memory!)
