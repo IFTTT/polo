@@ -1,9 +1,11 @@
 module Polo
   class Collector
+    DEFAULT_BATCH_SIZE = 1_000
     SqlRecord = Struct.new(:klass, :sql)
+
     def initialize(base_class, id, dependency_tree={})
       @base_class = base_class
-      @id = id
+      @ids = Array(id)
       @dependency_tree = dependency_tree
       @selects = Set.new
     end
@@ -14,20 +16,19 @@ module Polo
     # ActiveSupport::Notifications block and collecting every generate SQL query.
     #
     def collect
-      base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
-      # If we are not also looking up relationships, we can process many more records at once
-      batch_size = @dependency_tree.blank? ? 10_000 : 1_000
+      base_finder = @base_class.includes(@dependency_tree)
+      # If there are dependencies to load, we reduce the the batch size to compensate for
+      # the increased memory of loading all the associations at the same time.
+      batch_size = @dependency_tree.blank? ? DEFAULT_BATCH_SIZE : DEFAULT_BATCH_SIZE / 10
       enumerable = Enumerator.new do |yielder|
-        collect_sql(@base_class, base_finder.to_sql)
-        unprepared_statement do
-          ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
-            base_finder.find_in_batches(batch_size: batch_size).with_index do |batch, batch_index|
-              # Expose each select to the enumerator
-              yielder.yield(@selects)
-              # Now reset the accumulator (don't hog memory!)
-              @selects = Set.new
-            end
+        @ids.each_slice(batch_size).with_index do |batch_of_ids, batch_index|
+          with_sql_subscription do
+            base_finder.where(@base_class.primary_key => batch_of_ids).load
           end
+          # Expose this batch of SELECTs to the enumerator
+          yielder.yield(@selects)
+          # Reset the accumulator for the next batch (don't hog memory!)
+          @selects.clear
         end
       end
       # By using a lazy enumerator, we make it possible to garbage collect records
@@ -38,6 +39,15 @@ module Polo
     end
 
     private
+
+    # Captures all SQL queries executed in the given block, passing them to the collector
+    def with_sql_subscription
+      ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
+        unprepared_statement do
+          yield
+        end
+      end
+    end
 
     # Internal: Store ActiveRecord queries in @selects
     #
