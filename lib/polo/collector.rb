@@ -23,7 +23,8 @@ module Polo
       enumerable = Enumerator.new do |yielder|
         @ids.each_slice(batch_size).with_index do |batch_of_ids, batch_index|
           with_sql_subscription do
-            base_finder.where(@base_class.primary_key => batch_of_ids).load
+            loader_method = ActiveRecord::VERSION::MAJOR >= 4 ? :load : :to_a
+            base_finder.where(@base_class.primary_key => batch_of_ids).public_send(loader_method)
           end
           # Expose this batch of SELECTs to the enumerator
           yielder.yield(@selects)
