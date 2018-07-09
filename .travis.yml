@@ -7,4 +7,6 @@ gemfile:
   - gemfiles/rails41.gemfile
   - gemfiles/rails42.gemfile
   - gemfiles/rails50.gemfile
+  - gemfiles/rails51.gemfile
+  - gemfiles/rails52.gemfile
 before_install: gem install bundler -v 1.11.2
