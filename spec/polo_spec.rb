@@ -91,8 +91,7 @@ describe Polo do
 
       it 'only scrambles instances with the obfuscate field defined' do
         Polo.configure do
-          obfuscate :name,
-                    email: ->(e) { "#{e.split("@")[0]}_test@example.com" },
+          obfuscate email: ->(e) { "#{e.split("@")[0]}_test@example.com" },
                     title: ->(t) { t.chars.reverse!.join }
         end
 
@@ -100,7 +99,7 @@ describe Polo do
 
         explore_statement = exp.join(';')
         expect(explore_statement).to_not match('nettofarah@gmail.com')
-        expect(explore_statement).to_not match('Netto')
+        expect(explore_statement).to match('Netto')
       end
 
       it 'can target a specific field in a table' do
