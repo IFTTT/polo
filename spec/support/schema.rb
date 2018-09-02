@@ -39,4 +39,13 @@ ActiveRecord::Schema.define do
   create_table :employees, force: true do |t|
     t.column :name, :string
   end
+
+  create_table :tags, force: true do |t|
+    t.column :name, :string
+  end
+
+  create_table :recipes_tags, id: false, force: true do |t|
+    t.column :recipe_id, :integer
+    t.column :tag_id, :integer
+  end
 end

@@ -21,8 +21,13 @@ module Polo
       def ignore_transform(inserts, records)
         insert_and_record = inserts.zip(records)
         insert_and_record.map do |insert, record|
-          table_name = record.class.arel_table.name
-          id = record[:id]
+          if record.is_a?(Hash)
+            id = record.fetch(:values)[:id]
+            table_name = record.fetch(:table_name)
+          else
+            id = record[:id]
+            table_name = record.class.arel_table.name
+          end
           insert = insert.gsub(/VALUES \((.+)\)$/m, 'SELECT \\1')
           insert << " WHERE NOT EXISTS (SELECT 1 FROM #{table_name} WHERE id=#{id});"
         end

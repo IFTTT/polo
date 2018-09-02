@@ -17,7 +17,7 @@ module Polo
       unprepared_statement do
         ActiveSupport::Notifications.subscribed(collector, 'sql.active_record') do
           base_finder = @base_class.includes(@dependency_tree).where(@base_class.primary_key => @id)
-          collect_sql(@base_class, base_finder.to_sql)
+          collect_sql(klass: @base_class, sql: base_finder.to_sql)
           base_finder.to_a
         end
       end
@@ -35,22 +35,22 @@ module Polo
     #
     def collector
       lambda do |name, start, finish, id, payload|
-        return unless payload[:name] =~ /^(.*) Load$/
-        begin
-          class_name = $1.constantize
-          sql = payload[:sql]
-          collect_sql(class_name, sql)
-        rescue ActiveRecord::StatementInvalid, NameError
-          # invalid table name (common when prefetching schemas)
+        sql = payload[:sql]
+        if payload[:name] =~ /^HABTM_.* Load$/
+          collect_sql(connection: @base_class.connection, sql: sql)
+        elsif payload[:name] =~ /^(.*) Load$/
+          begin
+            class_name = $1.constantize
+            collect_sql(klass: class_name, sql: sql)
+          rescue ActiveRecord::StatementInvalid, NameError
+            # invalid table name (common when prefetching schemas)
+          end
         end
       end
     end
 
-    def collect_sql(klass, sql)
-      @selects << {
-        klass: klass,
-        sql: sql
-      }
+    def collect_sql(select)
+      @selects << select
     end
 
     def unprepared_statement
