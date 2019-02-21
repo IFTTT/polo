@@ -1,7 +1,7 @@
 module Polo
   class Collector
     DEFAULT_BATCH_SIZE = 1_000
-    SqlRecord = Struct.new(:klass, :sql)
+    SqlRecord = Struct.new(:klass, :sql, :connection)
 
     def initialize(base_class, id, dependency_tree={})
       @base_class = base_class
@@ -58,19 +58,22 @@ module Polo
     #
     def collector
       lambda do |name, start, finish, id, payload|
-        return unless payload[:name] =~ /^(.*) Load$/
-        begin
-          class_name = $1.constantize
-          sql = payload[:sql]
-          collect_sql(class_name, sql)
-        rescue ActiveRecord::StatementInvalid, NameError
-          # invalid table name (common when prefetching schemas)
+        sql = payload[:sql]
+        if payload[:name] =~ /^HABTM_.* Load$/
+          collect_sql(connection: @base_class.connection, sql: sql)
+        elsif payload[:name] =~ /^(.*) Load$/
+          begin
+            class_name = $1.constantize
+            collect_sql(klass: class_name, sql: sql)
+          rescue ActiveRecord::StatementInvalid, NameError
+            # invalid table name (common when prefetching schemas)
+          end
         end
       end
     end
 
-    def collect_sql(klass, sql)
-      @selects << SqlRecord.new(klass, sql)
+    def collect_sql(sql:, klass: nil, connection: nil)
+      @selects << SqlRecord.new(klass, sql, connection)
     end
 
     def unprepared_statement

@@ -48,6 +48,21 @@ describe Polo do
     expect(inserts).to include(two_cheeses)
   end
 
+  it 'generates inserts for HABTM relationships' do
+    ar_version = ActiveRecord::VERSION::STRING
+    skip("Not supported on ActiveRecord #{ar_version}") if ar_version < "4.1.0"
+    habtm_inserts = [
+      %q{INSERT INTO "recipes_tags" ("recipe_id", "tag_id") VALUES (2, 2)},
+      %q{INSERT INTO "tags" ("id", "name") VALUES (2, 'burgers')}
+    ]
+
+    inserts = Polo.explore(AR::Chef, 1, :recipes => :tags)
+
+    habtm_inserts.each do |habtm_insert|
+      expect(inserts).to include(habtm_insert)
+    end
+  end
+
   it 'generates inserts for many to many relationships' do
     many_to_many_inserts = [
       %q{INSERT INTO "recipes_ingredients" ("id", "recipe_id", "ingredient_id") VALUES (1, 1, 1)},
@@ -91,8 +106,7 @@ describe Polo do
 
       it 'only scrambles instances with the obfuscate field defined' do
         Polo.configure do
-          obfuscate :name,
-                    email: ->(e) { "#{e.split("@")[0]}_test@example.com" },
+          obfuscate email: ->(e) { "#{e.split("@")[0]}_test@example.com" },
                     title: ->(t) { t.chars.reverse!.join }
         end
 
@@ -100,7 +114,7 @@ describe Polo do
 
         explore_statement = exp.join(';')
         expect(explore_statement).to_not match('nettofarah@gmail.com')
-        expect(explore_statement).to_not match('Netto')
+        expect(explore_statement).to match('Netto')
       end
 
       it 'can target a specific field in a table' do

@@ -30,5 +30,14 @@ describe Polo::Adapters::Postgres do
       translated_sql = adapter.ignore_transform(inserts, records)
       expect(translated_sql).to eq(insert_netto)
     end
+
+    it 'works for hash-values instead of ActiveRecord instances' do
+      insert_netto = [%q{INSERT INTO "chefs" ("id", "name", "email") SELECT 1, 'Netto', 'nettofarah@gmail.com' WHERE NOT EXISTS (SELECT 1 FROM chefs WHERE id=1);}]
+
+      inserts = translator.inserts
+      records = [{table_name: "chefs", values: { id: 1, name: "Netto", email: "nettofarah@gmail.com"}}]
+      translated_sql = adapter.ignore_transform(inserts, records)
+      expect(translated_sql).to eq(insert_netto)
+    end
   end
 end

@@ -20,7 +20,8 @@ module Polo
     end
 
     def instances
-      active_record_instances = @selects.flat_map do |select|
+      active_record_selects, raw_selects = @selects.partition(&:klass)
+      active_record_instances = active_record_selects.flat_map do |select|
         select.klass.find_by_sql(select.sql).to_a
       end
 
@@ -29,7 +30,12 @@ module Polo
         active_record_instances = active_record_instances.map { |instance| obfuscate!(instance, fields) }
       end
 
-      active_record_instances
+      raw_instance_values = raw_selects.flat_map do |select|
+        table_name = select.sql[/^SELECT .* FROM (?:"|`)([^"`]+)(?:"|`)/, 1]
+        select.connection.select_all(select.sql).map { |values| {table_name: table_name, values: values} }
+      end
+
+      active_record_instances + raw_instance_values
     end
 
     private
