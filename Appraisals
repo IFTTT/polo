@@ -32,3 +32,7 @@ appraise "rails52" do
   gem "activerecord", "5.2.4.2"
   gem "sqlite3", "1.4.2"
 end
+
+appraise "rails60" do
+  gem "activerecord", "6.0.0"
+end
