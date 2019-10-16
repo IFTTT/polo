@@ -10,4 +10,4 @@ gemfile:
   - gemfiles/rails51.gemfile
   - gemfiles/rails52.gemfile
   - gemfiles/rails60.gemfile
-before_install: gem install bundler -v 1.11.2
+before_install: gem install bundler -v 2.0.2
