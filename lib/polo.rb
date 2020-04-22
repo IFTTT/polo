@@ -2,6 +2,7 @@ require "polo/version"
 require "polo/collector"
 require "polo/translator"
 require "polo/configuration"
+require "initializers/arel"
 
 module Polo
 
