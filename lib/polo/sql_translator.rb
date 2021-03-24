@@ -137,8 +137,8 @@ module Polo
     # their set values (for Rails 6.0).
     module ActiveRecordSix
       def raw_sql_from_record(record)
-        values = record.send(:attributes_with_values, record.class.column_names)
         model = record.class
+        values = record.send(:attributes_with_values, record.send(:attributes_for_create, model.column_names))
         substitutes_and_binds = model.send(:_substitute_values, values)
 
         insert_manager = model.arel_table.create_insert
