@@ -3,6 +3,7 @@ require "polo/collector"
 require "polo/translator"
 require "polo/configuration"
 require "initializers/arel"
+require "initializers/big_decimal"
 
 module Polo
 
