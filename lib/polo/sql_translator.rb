@@ -150,6 +150,23 @@ module Polo
       end
     end
 
+    # Internal: Returns an object's attribute definitions along with
+    # their set values (for Rails 7.0).
+    module ActiveRecordSeven
+      def raw_sql_from_record(record)
+        values = record.send(:attributes_with_values, record.class.column_names)
+        model = record.class
+        substitutes_and_binds = values.transform_keys { |name| model.arel_table[name] }
+
+        insert_manager = Arel::InsertManager.new(model.arel_table)
+        insert_manager.insert substitutes_and_binds
+
+        model.connection.unprepared_statement do
+          model.connection.to_sql(insert_manager)
+        end
+      end
+    end
+
     if ActiveRecord::VERSION::MAJOR < 4
       include ActiveRecordLessThanFour
     elsif ActiveRecord::VERSION::MAJOR == 4
@@ -158,8 +175,10 @@ module Polo
       prepend ActiveRecordFivePointZeroOrOne
     elsif ActiveRecord::VERSION::MAJOR == 5
       prepend ActiveRecordFive
-    else
+    elsif ActiveRecord::VERSION::MAJOR == 6
       prepend ActiveRecordSix
+    else
+      prepend ActiveRecordSeven
     end
   end
 end
