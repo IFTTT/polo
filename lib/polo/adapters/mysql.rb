@@ -4,7 +4,7 @@ module Polo
       def on_duplicate_key_update(inserts, records)
         insert_and_record = inserts.zip(records)
         insert_and_record.map do |insert, record|
-          attrs = record.is_a?(Hash) ? record.fetch(:values) : record.attributes
+          attrs = record.is_a?(Hash) ? record.fetch(:values) : record.attributes.slice(*record.class.column_names)
           values_syntax = attrs.keys.map do |key|
             "`#{key}` = VALUES(`#{key}`)"
           end
