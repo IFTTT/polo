@@ -42,7 +42,7 @@ module Polo
           raw_sql_from_record(record)
         end
 
-        sql.ends_with?(";") ? sql : sql + ";"
+        sql.end_with?(";") ? sql : sql + ";"
       end
     end
 
