@@ -9,7 +9,8 @@ module Polo
             "`#{key}` = VALUES(`#{key}`)"
           end
 
-          on_dup_syntax = "ON DUPLICATE KEY UPDATE #{values_syntax.join(', ')}"
+          on_dup_syntax = "ON DUPLICATE KEY UPDATE #{values_syntax.join(', ')};"
+          insert.gsub!(/;$/, '')
 
           "#{insert} #{on_dup_syntax}"
         end
