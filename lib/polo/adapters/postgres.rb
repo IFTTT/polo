@@ -30,6 +30,11 @@ module Polo
           end
           insert.gsub!(/;$/, '')
           insert = insert.gsub(/VALUES \((.+)\)$/m, 'SELECT \\1')
+
+          if record.class.respond_to?(:columns_hash) && ![:integer, :float, :decimal].include?(record.class.columns_hash["id"].type)
+            id = "'#{id}'"
+          end
+
           insert << " WHERE NOT EXISTS (SELECT 1 FROM #{table_name} WHERE id=#{id});"
         end
       end
