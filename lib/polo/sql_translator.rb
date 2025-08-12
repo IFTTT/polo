@@ -46,6 +46,14 @@ module Polo
       end
     end
 
+    def insertable_columns(record)
+      record.class.column_names - virtual_columns(record)
+    end
+
+    def virtual_columns(record)
+      record.class.columns_hash.select { |k, v| v.try(:virtual?) }.keys
+    end
+
     private
 
     # Internal: Generates an insert SQL statement for a given record
@@ -105,7 +113,7 @@ module Polo
     module ActiveRecordFivePointZeroOrOne
       # Based on the codepath used in Rails 5
       def raw_sql_from_record(record)
-        values = record.send(:arel_attributes_with_values_for_create, record.class.column_names)
+        values = record.send(:arel_attributes_with_values_for_create, insertable_columns(record))
         model = record.class
         substitutes, binds = model.unscoped.substitute_values(values)
 
@@ -122,7 +130,7 @@ module Polo
     # their set values (for Rails >= 5.2).
     module ActiveRecordFive
       def raw_sql_from_record(record)
-        values = record.send(:attributes_with_values_for_create, record.class.column_names)
+        values = record.send(:attributes_with_values_for_create, insertable_columns(record))
         model = record.class
         substitutes_and_binds = model.send(:_substitute_values, values)
 
@@ -156,7 +164,7 @@ module Polo
     # their set values (for Rails 7.0).
     module ActiveRecordSeven
       def raw_sql_from_record(record)
-        values = record.send(:attributes_with_values, record.class.column_names)
+        values = record.send(:attributes_with_values, insertable_columns(record))
         model = record.class
         substitutes_and_binds = values.transform_keys { |name| model.arel_table[name] }
 
