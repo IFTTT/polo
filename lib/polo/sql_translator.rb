@@ -36,11 +36,13 @@ module Polo
 
     def inserts
       records.map do |record|
-        if record.is_a?(Hash)
+        sql = if record.is_a?(Hash)
           raw_sql_from_hash(record)
         else
           raw_sql_from_record(record)
         end
+
+        sql.end_with?(";") ? sql : sql + ";"
       end
     end
 

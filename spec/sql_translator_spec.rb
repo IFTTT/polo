@@ -11,7 +11,7 @@ describe Polo::SqlTranslator do
   end
 
   it 'translates records to inserts' do
-    insert_netto = [%q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com')}]
+    insert_netto = [%q{INSERT INTO "chefs" ("id", "name", "email") VALUES (1, 'Netto', 'nettofarah@gmail.com');}]
     netto_to_sql = Polo::SqlTranslator.new(netto).to_sql
     expect(netto_to_sql).to eq(insert_netto)
   end
