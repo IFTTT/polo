@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.6.5
+  - 2.7.5
 gemfile:
   - gemfiles/rails32.gemfile
   - gemfiles/rails40.gemfile
@@ -10,4 +10,5 @@ gemfile:
   - gemfiles/rails51.gemfile
   - gemfiles/rails52.gemfile
   - gemfiles/rails60.gemfile
+  - gemfiles/rails70.gemfile
 before_install: gem install bundler -v 2.1.4
